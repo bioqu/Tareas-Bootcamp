@@ -6,9 +6,7 @@ plugins {
 android {
     namespace = "cl.uchile.dcc.mobile.gastospersonales"
     compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
+        version = release(37)
     }
 
     defaultConfig {
