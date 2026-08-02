@@ -34,6 +34,10 @@ import compose.icons.fontawesomeicons.solid.MoneyBill
 import compose.icons.FeatherIcons
 import compose.icons.feathericons.CreditCard
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -65,6 +69,9 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun FormularioGastos(name: String, modifier: Modifier = Modifier) {
+    var concepto by remember { mutableStateOf( "") }
+    var monto by remember { mutableStateOf( "") }
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
@@ -75,7 +82,7 @@ fun FormularioGastos(name: String, modifier: Modifier = Modifier) {
         Row() {
             Text(
                 text = "Nuevo Gasto",
-                fontSize = 30.sp,
+                style = MaterialTheme.typography.titleLarge,
             )
         }
         Spacer(
@@ -89,23 +96,17 @@ fun FormularioGastos(name: String, modifier: Modifier = Modifier) {
             modifier = Modifier
                 .fillMaxWidth()
         ) {
-            OutlinedCard(
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                ),
-                border = BorderStroke(1.dp, Color.Black),
-                modifier = Modifier
-
-            ) {
                 Icon(
                     imageVector = FeatherIcons.File,
                     contentDescription = null,
                     modifier = Modifier.padding(top = 8.dp, end = 8.dp)
                 )
-            }
+
             OutlinedTextField(
-                value = "",
-                onValueChange = { /* */ },
+                value = concepto,
+                onValueChange = { tecla ->
+                    concepto = tecla
+                                },
                 label = { Text("Concepto")}
             )
         }
@@ -127,8 +128,10 @@ fun FormularioGastos(name: String, modifier: Modifier = Modifier) {
                 modifier = Modifier.padding(top = 8.dp, end = 8.dp)
             )
             OutlinedTextField(
-                value = "",
-                onValueChange = { /* */ },
+                value = monto,
+                onValueChange = { tecla ->
+                    monto = tecla
+                                },
                 label = { Text("Monto")}
             )
         }
@@ -143,10 +146,13 @@ fun FormularioGastos(name: String, modifier: Modifier = Modifier) {
         )
         {
             ElevatedButton(
-                onClick = { /* */ },
+                onClick = { /* */
+                    concepto = ""
+                    monto = ""
+                },
                 colors = ButtonDefaults.buttonColors(
-                    contentColor = Color.Blue,
-                    containerColor = Color.LightGray
+                    contentColor = Color.Black,
+                    containerColor = Color.LightGray,
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -154,7 +160,7 @@ fun FormularioGastos(name: String, modifier: Modifier = Modifier) {
 
             ) {
                 Text(text = "GUARDAR",
-                    fontSize = 24.sp)
+                    style = MaterialTheme.typography.titleLarge)
             }
         }
 
