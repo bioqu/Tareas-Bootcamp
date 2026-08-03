@@ -19,7 +19,7 @@ import cl.uchile.dcc.mobile.gastospersonales.ui.component.GastosCard
 fun GastosMostrar(modifier: Modifier) {
     var gastos by remember { mutableStateOf( mutableListOf<GastosRegistry>()) }
 
-    gastos.add(GastosRegistry("Perras", 1000000))
+    gastos.add(GastosRegistry("Auto", 1000000))
     gastos.add(GastosRegistry("Café", 5000))
 
 
