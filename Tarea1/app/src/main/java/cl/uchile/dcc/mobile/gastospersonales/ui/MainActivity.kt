@@ -11,18 +11,18 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.ui.Alignment
 import compose.icons.FeatherIcons
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import cl.uchile.dcc.mobile.gastospersonales.ui.component.IconoButton
 import cl.uchile.dcc.mobile.gastospersonales.ui.screen.FormularioGastos
 import cl.uchile.dcc.mobile.gastospersonales.ui.screen.GastosMostrar
+import cl.uchile.dcc.mobile.gastospersonales.ui.screen.ScreenEnum
 import cl.uchile.dcc.mobile.gastospersonales.ui.theme.GastosPersonalesTheme
 import cl.uchile.dcc.mobile.gastospersonales.viewmodel.MainScreenViewModel
 import compose.icons.feathericons.ArrowLeft
@@ -38,7 +38,23 @@ class MainActivity : ComponentActivity() {
             GastosPersonalesTheme {
                 Scaffold(
                     topBar = {
-                        IconoButton("Volver", callBack = { /*TODO */}, FeatherIcons.ArrowLeft)
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Start,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp)) {
+                        IconoButton("Volver", callBack = { /*TODO */ }, FeatherIcons.ArrowLeft)
+                        if (viewModel.actualScreen == ScreenEnum.REGISTRY) {
+                            Text(
+                                text = viewModel.actualScreen.title,
+                                style = MaterialTheme.typography.titleLarge,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier
+                                    .padding(8.dp, 8.dp)
+                            )
+                        }
+                            }
                     },
                     bottomBar = {
                         Row(
@@ -51,7 +67,11 @@ class MainActivity : ComponentActivity() {
                                 Modifier
                                     .clickable( onClick = { viewModel.changetoFormulario()} ),
                             ) {
-                                IconoButton("Volver", callBack = { viewModel.changetoFormulario()}, FeatherIcons.Plus)
+                                IconoButton(
+                                    ScreenEnum.FORMULARIO.title,
+                                    callBack = { viewModel.changetoFormulario()},
+                                    FeatherIcons.Plus,
+                                    enabled = viewModel.actualScreen != ScreenEnum.FORMULARIO)
                                 Text(
                                     text = "Agregar",
                                     style = MaterialTheme.typography.titleSmall,
@@ -61,7 +81,11 @@ class MainActivity : ComponentActivity() {
                                 Modifier
                                     .clickable( onClick = { viewModel.changetoGastos()} ),
                             ) {
-                                IconoButton("Volver", callBack = { viewModel.changetoGastos()}, FeatherIcons.Clipboard)
+                                IconoButton(
+                                    "Volver",
+                                    callBack = { viewModel.changetoGastos()},
+                                    FeatherIcons.Clipboard,
+                                    enabled = viewModel.actualScreen != ScreenEnum.REGISTRY)
                                 Text(
                                     text = "Historial",
                                     style = MaterialTheme.typography.titleSmall,
@@ -73,12 +97,12 @@ class MainActivity : ComponentActivity() {
                         .fillMaxSize()
                         .padding(20.dp)
                 ) { innerPadding ->
-                    if (viewModel.actualScreen == "FORMULARIO") {
-                        FormularioGastos(
+                    when (viewModel.actualScreen) {
+                        ScreenEnum.FORMULARIO -> FormularioGastos(
                             modifier = Modifier.padding(innerPadding)
                         )
-            } else if (viewModel.actualScreen == "GASTOS"){
-                        GastosMostrar(
+
+                        ScreenEnum.REGISTRY ->  GastosMostrar(
                             modifier = Modifier.padding(innerPadding)
                         )
                     }

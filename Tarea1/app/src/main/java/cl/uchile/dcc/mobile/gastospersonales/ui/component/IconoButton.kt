@@ -11,9 +11,14 @@ import compose.icons.FeatherIcons
 import compose.icons.feathericons.ArrowLeft
 
 @Composable
-fun IconoButton(label: String, callBack: () -> Unit, icon: ImageVector) {
+fun IconoButton(
+    label: String,
+    callBack: () -> Unit,
+    icon: ImageVector,
+    enabled: Boolean = true) {
     IconButton(
-        onClick = { callBack() }
+        onClick = { callBack() },
+        enabled = enabled
     ) {
         Icon(
             imageVector = icon,

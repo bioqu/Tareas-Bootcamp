@@ -32,8 +32,8 @@ fun FormularioGastos(
     modifier: Modifier = Modifier.Companion,
     viewModel: RegistryViewModel = viewModel()
 ) {
-    var concepto by remember { mutableStateOf( "") }
-    var monto by remember { mutableStateOf( "") }
+    var concepto = viewModel.concepto
+    var monto = viewModel.monto
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -69,7 +69,8 @@ fun FormularioGastos(
             InputText(
                 label = "Concepto",
                 value = concepto,
-                onValueChange = { concepto = it }
+                onValueChange = {
+                    viewModel.concepto = it }
             )
         }
         Row(
@@ -86,7 +87,8 @@ fun FormularioGastos(
             InputText(
                 label = "Monto",
                 value = monto,
-                onValueChange = { monto = it },
+                onValueChange = {
+                    viewModel.monto = it },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
         }
@@ -103,8 +105,8 @@ fun FormularioGastos(
                 enable = concepto.isNotEmpty(),
                 callBack = {
                     viewModel.addGasto(concepto, monto.toIntOrNull() ?: 0)
-                    concepto = "";
-                    monto = ""})
+                    viewModel.resetConcepto();
+                    viewModel.resetMonto()})
         }
 
     }
