@@ -29,20 +29,26 @@ class RegistryViewModel : ViewModel() {
     val isValidConcepto: Boolean
         get() = concepto.isNotEmpty() && errorConcepto == null
 
-    /* Prueba */
-    /* Prueba */
-    /* Prueba */
-
+    // Implementación error de Monto en Gastos
     var errorMonto by mutableStateOf<String?>(null)
         private set
 
-    fun onChangeMonto(nuevoValor: String) {
-        // Opción A: Solo aceptar números (filtra lo que no sea dígito)
-        monto = nuevoValor.filter { it.isDigit() }
+    // Función auxiliar para verificar notificar al usuario que en el InputText de monto solo puede
+    // ingresar números
+    private fun esSoloNumeros(texto: String): Boolean {
+        return texto.toIntOrNull() != null
+    }
 
+
+    fun onChangeMonto(nuevoValor: String) {
+        // Solo aceptar números (filtra lo que no sea dígito)
+        if (nuevoValor.isEmpty() || esSoloNumeros(nuevoValor)) {
+            monto = nuevoValor
+        }
         errorMonto = when {
-            monto.isEmpty() -> "El monto no puede estar vacío"
+            monto.isEmpty() -> "El monto debe contener solo números"
             monto.toIntOrNull() == null -> "Ingresa un monto válido"
+            !esSoloNumeros(monto) -> "El monto debe contener solo números"
             else -> null
         }
     }
@@ -51,9 +57,6 @@ class RegistryViewModel : ViewModel() {
     val isValidMonto: Boolean
         get() = monto.isNotEmpty() && errorMonto == null
 
-    /* Prueba */
-    /* Prueba */
-    /* Prueba */
 
     fun addGasto(concepto: String, monto: Int) {
         val gasto = GastosRegistry(concepto, monto)

@@ -15,18 +15,20 @@ import cl.uchile.dcc.mobile.gastospersonales.viewmodel.RegistryViewModel
 
 @Composable
 fun GastosMostrar(
-    modifier: Modifier,
+    modifier: Modifier = Modifier.Companion,
     viewModel: RegistryViewModel = viewModel()
 ) {
-
+    // LazyColumn que albergara los gastos ingresados en la pantalla FormularioGastos.kt
     LazyColumn(modifier = Modifier
         .fillMaxSize()
-        .padding(24.dp, top = 54.dp, end = 24.dp),
+        .padding(24.dp, top = 100.dp, end = 24.dp),
         content = {
             items(
                 items = viewModel.gastos,
                 key = { it.hashCode() } // opcional pero recomendado para mejor performance
             ) { gasto ->
+                // GastosCard genera un Card() con los gastos ordenados asi:
+                // concepto de gasto a lado izquierdo y al lado derecho monto
                 GastosCard(gasto) // pasa el ítem individual, no toda la lista
             }
     }

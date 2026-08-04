@@ -23,6 +23,9 @@ import cl.uchile.dcc.mobile.gastospersonales.model.GastosRegistry
 import compose.icons.FeatherIcons
 import compose.icons.feathericons.DollarSign
 
+// GastosCard :: gastos -> Card()
+// Genera Card() con la lista de gastos con concepto y monto en filas
+// GastosCard(gasto) Genera un Card() con concepto de gasto a lado izquierdo y al lado derecho monto
 @Composable
 fun GastosCard(gastos: GastosRegistry) {
     Card(
@@ -30,14 +33,10 @@ fun GastosCard(gastos: GastosRegistry) {
         .fillMaxWidth()
         .padding(2.dp, top = 8.dp)
     ) {
-        Column(
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceEvenly,
             modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                modifier = Modifier
                 .fillMaxWidth()) {
                 Text(
                     text = gastos.concepto,
@@ -54,7 +53,5 @@ fun GastosCard(gastos: GastosRegistry) {
                     textAlign = TextAlign.Right
                 )
             }
-
-        }
     }
 }

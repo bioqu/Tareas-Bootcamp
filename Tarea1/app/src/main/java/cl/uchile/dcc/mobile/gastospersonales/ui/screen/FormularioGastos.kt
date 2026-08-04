@@ -31,7 +31,7 @@ fun FormularioGastos(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
         modifier = modifier
-            .padding(2.dp)
+            .padding(top = 24.dp)
             .fillMaxWidth(1f)
     )
     {
@@ -71,11 +71,13 @@ fun FormularioGastos(
         {
             SubmitButton(
                 "GUARDAR",
-                enable = viewModel.isValidConcepto,
+                enable = viewModel.isValidConcepto && viewModel.isValidMonto,
                 callBack = {
                     viewModel.addGasto(viewModel.concepto, viewModel.monto.toIntOrNull() ?: 0)
                     viewModel.resetConcepto();
-                    viewModel.resetMonto()})
+                    viewModel.resetMonto()
+                }
+            )
         }
 
     }
