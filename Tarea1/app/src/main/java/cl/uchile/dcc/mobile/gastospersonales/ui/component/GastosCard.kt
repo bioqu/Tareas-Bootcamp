@@ -42,7 +42,6 @@ fun GastosCard(gastos: GastosRegistry) {
                     text = gastos.concepto,
                     modifier = Modifier
                         .padding(16.dp),
-                    textAlign = TextAlign.Left
                 )
                 Spacer(modifier = Modifier.weight(1f))
 
@@ -50,7 +49,6 @@ fun GastosCard(gastos: GastosRegistry) {
                     text = "${gastos.monto}$",
                     modifier = Modifier
                         .padding(16.dp),
-                    textAlign = TextAlign.Right
                 )
             }
     }

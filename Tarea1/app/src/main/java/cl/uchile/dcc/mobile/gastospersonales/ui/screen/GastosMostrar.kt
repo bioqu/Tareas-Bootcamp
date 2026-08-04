@@ -4,7 +4,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberOverscrollEffect
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -19,9 +23,10 @@ fun GastosMostrar(
     viewModel: RegistryViewModel = viewModel()
 ) {
     // LazyColumn que albergara los gastos ingresados en la pantalla FormularioGastos.kt
-    LazyColumn(modifier = Modifier
+    LazyColumn(
+        modifier = modifier
         .fillMaxSize()
-        .padding(24.dp, top = 100.dp, end = 24.dp),
+        .padding(24.dp, end = 24.dp),
         content = {
             items(
                 items = viewModel.gastos,

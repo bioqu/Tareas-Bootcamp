@@ -4,13 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Icon
@@ -24,19 +18,16 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import compose.icons.FeatherIcons
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import cl.uchile.dcc.mobile.gastospersonales.ui.component.FigureIconButton
 import cl.uchile.dcc.mobile.gastospersonales.ui.screen.FormularioGastos
 import cl.uchile.dcc.mobile.gastospersonales.ui.screen.GastosMostrar
 import cl.uchile.dcc.mobile.gastospersonales.ui.screen.ScreenEnum
 import cl.uchile.dcc.mobile.gastospersonales.ui.theme.GastosPersonalesTheme
 import cl.uchile.dcc.mobile.gastospersonales.viewmodel.MainScreenViewModel
+import cl.uchile.dcc.mobile.gastospersonales.viewmodel.RegistryViewModel
 import compose.icons.feathericons.ArrowLeft
 import compose.icons.feathericons.Clipboard
 import compose.icons.feathericons.Plus
@@ -46,13 +37,15 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        // Instancia de viewModel
+        // Instancia de viewModel y RegistryViewModel
         val viewModel = MainScreenViewModel()
+        val registryViewModel = RegistryViewModel() // Este es el compartido
+
         setContent {
             GastosPersonalesTheme {
                 Scaffold(
                     topBar = {
-                        //TopAppBar TopBar con un titulo centrado y un iconbutton para  volver
+                        //CenterAlignedTopAppBar TopBar con un titulo centrado y un iconbutton para  volver
                         CenterAlignedTopAppBar(
                             colors = TopAppBarDefaults.topAppBarColors(
                                 containerColor = MaterialTheme.colorScheme.secondaryContainer,
@@ -100,11 +93,13 @@ class MainActivity : ComponentActivity() {
                 ) { innerPadding ->
                     when (viewModel.actualScreen) {
                         ScreenEnum.FORMULARIO -> FormularioGastos(
-                            modifier = Modifier.padding(innerPadding)
+                            modifier = Modifier.padding(innerPadding),
+                            viewModel = registryViewModel
                         )
 
                         ScreenEnum.REGISTRY ->  GastosMostrar(
-                            modifier = Modifier.padding(innerPadding)
+                            modifier = Modifier.padding(innerPadding),
+                            viewModel = registryViewModel
                         )
                     }
         }
