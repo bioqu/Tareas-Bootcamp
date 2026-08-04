@@ -14,12 +14,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import compose.icons.FeatherIcons
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import cl.uchile.dcc.mobile.gastospersonales.ui.component.IconoButton
+import cl.uchile.dcc.mobile.gastospersonales.ui.component.FigureIconButton
 import cl.uchile.dcc.mobile.gastospersonales.ui.screen.FormularioGastos
 import cl.uchile.dcc.mobile.gastospersonales.ui.screen.GastosMostrar
 import cl.uchile.dcc.mobile.gastospersonales.ui.screen.ScreenEnum
@@ -44,7 +46,7 @@ class MainActivity : ComponentActivity() {
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(8.dp)) {
-                        IconoButton("Volver", callBack = { /*TODO */ }, FeatherIcons.ArrowLeft)
+                        FigureIconButton("Volver", callBack = { /*TODO */ }, FeatherIcons.ArrowLeft)
                         if (viewModel.actualScreen == ScreenEnum.REGISTRY) {
                             Text(
                                 text = viewModel.actualScreen.title,
@@ -67,7 +69,7 @@ class MainActivity : ComponentActivity() {
                                 Modifier
                                     .clickable( onClick = { viewModel.changetoFormulario()} ),
                             ) {
-                                IconoButton(
+                                FigureIconButton(
                                     ScreenEnum.FORMULARIO.title,
                                     callBack = { viewModel.changetoFormulario()},
                                     FeatherIcons.Plus,
@@ -81,7 +83,7 @@ class MainActivity : ComponentActivity() {
                                 Modifier
                                     .clickable( onClick = { viewModel.changetoGastos()} ),
                             ) {
-                                IconoButton(
+                                FigureIconButton(
                                     "Volver",
                                     callBack = { viewModel.changetoGastos()},
                                     FeatherIcons.Clipboard,
@@ -112,12 +114,10 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-
-
-//@Preview(showBackground = true)
-//@Composable
-//fun FormularioGastosPreview() {
-//    GastosPersonalesTheme {
-//        FormularioGastos()
-//    }
-//}
+@Preview(showBackground = true)
+@Composable
+fun FormularioGastosPreview() {
+    GastosPersonalesTheme {
+        FormularioGastos()
+    }
+}

@@ -6,11 +6,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import compose.icons.FeatherIcons
-import compose.icons.feathericons.Check
 
 @Composable
-fun Icono(label: String, icon: ImageVector) {
+fun FigureIcon(label: String, icon: ImageVector) {
     Icon(
         imageVector = icon,
         contentDescription = null,

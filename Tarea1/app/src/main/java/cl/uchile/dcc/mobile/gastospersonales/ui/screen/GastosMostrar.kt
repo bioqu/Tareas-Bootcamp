@@ -5,31 +5,30 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import cl.uchile.dcc.mobile.gastospersonales.model.GastosRegistry
+import androidx.lifecycle.viewmodel.compose.viewModel
 import cl.uchile.dcc.mobile.gastospersonales.ui.component.GastosCard
+import cl.uchile.dcc.mobile.gastospersonales.viewmodel.RegistryViewModel
+
 
 
 @Composable
-fun GastosMostrar(modifier: Modifier) {
-    var gastos by remember { mutableStateOf( mutableListOf<GastosRegistry>()) }
-
-    gastos.add(GastosRegistry("Auto", 1000000))
-    gastos.add(GastosRegistry("Café", 5000))
-
+fun GastosMostrar(
+    modifier: Modifier,
+    viewModel: RegistryViewModel = viewModel()
+) {
 
     LazyColumn(modifier = Modifier
         .fillMaxSize()
-        .padding(36.dp),
+        .padding(24.dp, top = 54.dp, end = 24.dp),
         content = {
-        items(gastos) { gasto ->
-            GastosCard(gasto)
-        }
+            items(
+                items = viewModel.gastos,
+                key = { it.hashCode() } // opcional pero recomendado para mejor performance
+            ) { gasto ->
+                GastosCard(gasto) // pasa el ítem individual, no toda la lista
+            }
     }
     )
 }

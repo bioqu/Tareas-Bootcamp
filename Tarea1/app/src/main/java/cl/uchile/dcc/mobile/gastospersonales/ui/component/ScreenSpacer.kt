@@ -8,7 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun Espaciador() {
+fun ScreenSpacer() {
     Spacer(
         modifier = Modifier
             .width(32.dp)

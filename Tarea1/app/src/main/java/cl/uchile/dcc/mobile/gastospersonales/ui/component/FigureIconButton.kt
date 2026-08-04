@@ -7,11 +7,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import compose.icons.FeatherIcons
-import compose.icons.feathericons.ArrowLeft
 
 @Composable
-fun IconoButton(
+fun FigureIconButton(
     label: String,
     callBack: () -> Unit,
     icon: ImageVector,
