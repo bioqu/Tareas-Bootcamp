@@ -7,6 +7,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
+// ScreenSpacer :: -> Spacer() { }
+// Genera un Spacer
+// ejemplo: ScreenSpacer() genera una separación entre objetos en la pantalla
 @Composable
 fun ScreenSpacer() {
     Spacer(

@@ -1,5 +1,8 @@
 package cl.uchile.dcc.mobile.gastospersonales.ui.screen
 
+// ScreenEnum :: String String  -> routing
+
+
 enum class ScreenEnum (
     val title: String,
     val route: String,
@@ -9,7 +12,7 @@ enum class ScreenEnum (
         route = "Formulario"
     ),
 
-    REGISTRY(
+    HISTORIAL(
         title = "Historial de Gastos",
         route = "Registry"
     )

@@ -2,6 +2,8 @@ package cl.uchile.dcc.mobile.gastospersonales.ui.component
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Text
@@ -11,6 +13,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 
+// SubmitButton :: String enable callBack -> ElevatedButton() { }
+// Genera un Button del tipo elevado con forma elevada
+// ejemplo: SubmitButton( "GUARDAR", enable =  enable, callBack = {}) genera un button con forma elevada
 @Composable
 fun SubmitButton(text: String, enable: Boolean, callBack: () -> Unit) {
     ElevatedButton(
