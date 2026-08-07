@@ -28,6 +28,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -55,7 +57,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         // Instancia de viewModel
-        val viewModel = MainScreenViewModel()
+        val screenViewModel = MainScreenViewModel()
         setContent {
             GastosPersonalesTheme {
                 Surface(
@@ -72,14 +74,22 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(screenViewModel: MainScreenViewModel = viewModel()) {
+    // La navegación se gestiona mediante el MainScreenViewModel usando el ScreenEnum
     val actualScreen = screenViewModel.actualScreen
     val density = LocalDensity.current
+
+    // Se crea variable para registrar si el teclado esta presente en pantalla
     val isKeyboardOpen = WindowInsets.ime.getBottom(density) > 0
 
+    // Se crea el estado de snackbarHostState
+    val snackbarHostState = remember { SnackbarHostState() }
+
+
     Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             if (actualScreen == ScreenEnum.HISTORIAL) {
-                //TopAppBar TopBar con un titulo centrado y un iconbutton para  volver
+                //CentralTopAppBar TopBar con un titulo centrado y un iconbutton para  volver
                 CenterAlignedTopAppBar(
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = MaterialTheme.colorScheme.secondaryContainer,
@@ -105,12 +115,13 @@ fun MainScreen(screenViewModel: MainScreenViewModel = viewModel()) {
             }
         },
         bottomBar = {
+            // Condicional
             // Solo se muestra cuando el teclado NO está abierto
             if (!isKeyboardOpen) {
                 NavigationBar(
                     windowInsets = WindowInsets.navigationBars
                 ) {
-
+                    // NavigationBarItem crea un tipo IconButton y texto que permite navegar entre pantalla
                     NavigationBarItem(
                         selected = actualScreen == ScreenEnum.FORMULARIO,
                         onClick = { screenViewModel.changeScreen(ScreenEnum.FORMULARIO) },
@@ -143,7 +154,9 @@ fun MainScreen(screenViewModel: MainScreenViewModel = viewModel()) {
         when (actualScreen) {
             ScreenEnum.FORMULARIO -> FormularioGastos(
                 modifier = Modifier
-                    .padding(innerPadding)
+                    .padding(innerPadding),
+                // Se pasa estado de snackbarHostState
+                snackbarHostState = snackbarHostState
             )
 
             ScreenEnum.HISTORIAL ->  GastosMostrar(
@@ -158,6 +171,6 @@ fun MainScreen(screenViewModel: MainScreenViewModel = viewModel()) {
 @Composable
 fun FormularioGastosPreview() {
     GastosPersonalesTheme {
-        FormularioGastos()
+        TODO()
     }
 }

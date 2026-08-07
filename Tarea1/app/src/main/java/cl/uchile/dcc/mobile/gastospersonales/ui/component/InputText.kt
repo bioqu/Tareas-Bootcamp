@@ -13,8 +13,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 
 // InputText :: String String onValueChange -> Unit icon errorMessage KeyboardOPtions -> OutlinedTextfield() { }
-// Genera un cuadro de texto donde se puede escribir
-// ejemplo: InputText( "Monto", viewModel.monto, onValueChange , isError = viewModel.errorMonto != null, icon = FeatherIcons.DollarSign,
+// Genera un cuadro de texto (outlinedTextField) donde se puede escribir datos
+// ejemplo: InputText( "Monto", viewModel.monto, onValueChange , isError , icon ,
 // errorMessage, keyboardOptions) genera cuadro de texto para escribir con un icono al lado izquierdo
 @Composable
 fun InputText(

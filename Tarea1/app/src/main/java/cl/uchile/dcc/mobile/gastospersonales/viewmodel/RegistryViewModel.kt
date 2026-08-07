@@ -1,5 +1,6 @@
 package cl.uchile.dcc.mobile.gastospersonales.viewmodel
 
+import android.icu.text.DecimalFormat
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -36,7 +37,7 @@ class RegistryViewModel : ViewModel() {
     val isValidConcepto: Boolean
         get() = concepto.isNotEmpty() && errorConcepto == null
 
-    // Tratamiento de datos y errores relacionado a concepto de gasto
+    // Tratamiento de datos y errores relacionado a monto de gasto
     // Implementación error de Monto en Gastos
     var errorMonto by mutableStateOf<String?>(null)
         private set
@@ -67,12 +68,19 @@ class RegistryViewModel : ViewModel() {
     val isValidMonto: Boolean
         get() = monto.isNotEmpty() && errorMonto == null
 
+    // Formatear numero en monto de manera que aparezca en formato ###.###.###
+    fun splitDigits(number: Int): String {
+        val formatter = android.icu.text.DecimalFormat("#,###")
+        return formatter.format(number).replace(",", ".") // Forzamos el punto chileno
+    }
+
     // Añadir Gasto
     fun addGasto(concepto: String, monto: Int) {
         val gasto = GastosRegistry(formatearEntrada(concepto), monto)
         gastos.add(gasto)
     }
 
+    // Funciones para resetear campos luego de ingresar información
     fun resetConcepto() {
         concepto = ""
     }
