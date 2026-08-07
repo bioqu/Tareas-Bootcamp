@@ -4,14 +4,18 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -20,18 +24,22 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import compose.icons.FeatherIcons
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import cl.uchile.dcc.mobile.gastospersonales.ui.component.FigureIconButton
+import androidx.lifecycle.viewmodel.compose.viewModel
 import cl.uchile.dcc.mobile.gastospersonales.ui.screen.FormularioGastos
 import cl.uchile.dcc.mobile.gastospersonales.ui.screen.GastosMostrar
 import cl.uchile.dcc.mobile.gastospersonales.ui.screen.ScreenEnum
@@ -50,66 +58,99 @@ class MainActivity : ComponentActivity() {
         val viewModel = MainScreenViewModel()
         setContent {
             GastosPersonalesTheme {
-                Scaffold(
-                    topBar = {
-                        //TopAppBar TopBar con un titulo centrado y un iconbutton para  volver
-                        CenterAlignedTopAppBar(
-                            colors = TopAppBarDefaults.topAppBarColors(
-                                containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                                titleContentColor = MaterialTheme.colorScheme.secondary,
-                            ),
-                            title = {
-                                if (viewModel.actualScreen == ScreenEnum.REGISTRY) {
-                                    Text(
-                                        text = viewModel.actualScreen.title,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis
-                                    )
-                                }
-                            },
-                            navigationIcon = {
-                                IconButton(onClick = { /* do something */ }) {
-                                    Icon(
-                                        imageVector = FeatherIcons.ArrowLeft,
-                                        contentDescription = "Volver"
-                                    )
-                                }
-                            },
-                        )
-                    },
-                    bottomBar = {
-                            NavigationBar(
-                                windowInsets = NavigationBarDefaults.windowInsets
-                            ) {
-                                NavigationBarItem(
-                                    selected = viewModel.actualScreen == ScreenEnum.FORMULARIO,
-                                    onClick = { viewModel.changetoFormulario() },
-                                    icon = { Icon(FeatherIcons.Plus, contentDescription = ScreenEnum.FORMULARIO.title) },
-                                    label = { Text(ScreenEnum.FORMULARIO.title) }
-                                )
-                                NavigationBarItem(
-                                    selected = viewModel.actualScreen == ScreenEnum.REGISTRY,
-                                    onClick = { viewModel.changetoGastos() },
-                                    icon = { Icon(FeatherIcons.Clipboard, contentDescription = ScreenEnum.REGISTRY.title) },
-                                    label = { Text(ScreenEnum.REGISTRY.title) }
-                                )
-                            }
-                    },
-                    modifier = Modifier
-                        .fillMaxSize()
-                ) { innerPadding ->
-                    when (viewModel.actualScreen) {
-                        ScreenEnum.FORMULARIO -> FormularioGastos(
-                            modifier = Modifier.padding(innerPadding)
-                        )
-
-                        ScreenEnum.REGISTRY ->  GastosMostrar(
-                            modifier = Modifier.padding(innerPadding)
-                        )
-                    }
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    MainScreen()
+                }
+            }
         }
     }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MainScreen(screenViewModel: MainScreenViewModel = viewModel()) {
+    val actualScreen = screenViewModel.actualScreen
+    val density = LocalDensity.current
+    val isKeyboardOpen = WindowInsets.ime.getBottom(density) > 0
+
+    Scaffold(
+        topBar = {
+            if (actualScreen == ScreenEnum.HISTORIAL) {
+                //TopAppBar TopBar con un titulo centrado y un iconbutton para  volver
+                CenterAlignedTopAppBar(
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                        titleContentColor = MaterialTheme.colorScheme.secondary,
+                    ),
+                    title = {
+
+                        Text(
+                            text = actualScreen.title,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = { screenViewModel.changeScreen(ScreenEnum.FORMULARIO)  }) {
+                            Icon(
+                                imageVector = FeatherIcons.ArrowLeft,
+                                contentDescription = "Volver"
+                            )
+                        }
+                    },
+                )
+            }
+        },
+        bottomBar = {
+            // Solo se muestra cuando el teclado NO está abierto
+            if (!isKeyboardOpen) {
+                NavigationBar(
+                    windowInsets = WindowInsets.navigationBars
+                ) {
+
+                    NavigationBarItem(
+                        selected = actualScreen == ScreenEnum.FORMULARIO,
+                        onClick = { screenViewModel.changeScreen(ScreenEnum.FORMULARIO) },
+                        icon = {
+                            Icon(
+                                FeatherIcons.Plus,
+                                contentDescription = ScreenEnum.FORMULARIO.title
+                            )
+                        },
+                        label = { Text(ScreenEnum.FORMULARIO.title) }
+                    )
+                    NavigationBarItem(
+                        selected = actualScreen == ScreenEnum.HISTORIAL,
+                        onClick = { screenViewModel.changeScreen(ScreenEnum.HISTORIAL) },
+                        icon = {
+                            Icon(
+                                FeatherIcons.Clipboard,
+                                contentDescription = ScreenEnum.HISTORIAL.title
+                            )
+                        },
+                        label = { Text(ScreenEnum.HISTORIAL.title) }
+                    )
+                }
+            }
+                    },
+        modifier = Modifier
+            .fillMaxSize()
+            .imePadding()
+    ) { innerPadding ->
+        when (actualScreen) {
+            ScreenEnum.FORMULARIO -> FormularioGastos(
+                modifier = Modifier
+                    .padding(innerPadding)
+            )
+
+            ScreenEnum.HISTORIAL ->  GastosMostrar(
+                modifier = Modifier
+                    .padding(innerPadding)
+            )
+        }
     }
 }
 

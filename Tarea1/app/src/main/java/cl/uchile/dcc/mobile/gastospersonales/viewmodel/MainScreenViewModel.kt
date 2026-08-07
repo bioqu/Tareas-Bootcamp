@@ -8,20 +8,11 @@ import cl.uchile.dcc.mobile.gastospersonales.ui.screen.ScreenEnum
 
 
 class MainScreenViewModel : ViewModel() {
-
     var actualScreen by mutableStateOf(ScreenEnum.FORMULARIO)
         private set
 
-    fun changetoFormulario() {
-        actualScreen = ScreenEnum.FORMULARIO
+    fun changeScreen(newScreen: ScreenEnum): ScreenEnum {
+        actualScreen = newScreen
+        return actualScreen
     }
-
-    fun changetoGastos() {
-        actualScreen = ScreenEnum.REGISTRY
-    }
-
-
-
-
-
 }

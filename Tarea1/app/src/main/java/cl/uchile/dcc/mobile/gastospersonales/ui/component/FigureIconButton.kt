@@ -10,7 +10,7 @@ import androidx.compose.ui.unit.dp
 
 // FigureIconButton :: String callBack icon enabled -> Icon() { }
 // Genera un Button con forma de Icon, que se puede hacer click
-//ejemplo: FigureIconButton("Volver", callBack = { }, FeatherIcons.ArrowLeft) Crea un button en forma de flecha a la izquierda
+// ejemplo: FigureIconButton("Volver", callBack = { }, FeatherIcons.ArrowLeft) Crea un button en forma de flecha a la izquierda
 @Composable
 fun FigureIconButton(
     label: String,
