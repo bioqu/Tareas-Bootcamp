@@ -84,7 +84,6 @@ class RegistryViewModel : ViewModel() {
     fun resetConcepto() {
         concepto = ""
     }
-
     fun resetMonto() {
         monto = ""
     }
