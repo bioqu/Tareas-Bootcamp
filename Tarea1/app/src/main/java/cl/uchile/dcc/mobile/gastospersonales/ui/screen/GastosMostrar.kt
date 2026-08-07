@@ -19,9 +19,9 @@ fun GastosMostrar(
     viewModel: RegistryViewModel = viewModel()
 ) {
     // LazyColumn que albergara los gastos ingresados en la pantalla FormularioGastos.kt
-    LazyColumn(modifier = Modifier
+    LazyColumn(modifier = modifier
         .fillMaxSize()
-        .padding(24.dp, top = 100.dp, end = 24.dp),
+        .padding(8.dp),
         content = {
             items(
                 items = viewModel.gastos,

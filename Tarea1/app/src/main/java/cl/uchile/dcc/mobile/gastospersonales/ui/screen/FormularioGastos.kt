@@ -1,16 +1,24 @@
 package cl.uchile.dcc.mobile.gastospersonales.ui.screen
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsBottomHeight
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import cl.uchile.dcc.mobile.gastospersonales.ui.component.ScreenSpacer
@@ -27,12 +35,16 @@ fun FormularioGastos(
     modifier: Modifier = Modifier.Companion,
     viewModel: RegistryViewModel = viewModel()
 ) {
+    // Dentro de tu Composable
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
         modifier = modifier
             .padding(top = 24.dp)
             .fillMaxWidth(1f)
+            .imePadding()
+            .verticalScroll(rememberScrollState())
     )
     {
             Text(
@@ -48,7 +60,7 @@ fun FormularioGastos(
             onValueChange = { viewModel.onChangeConcepto(it) },
             isError = viewModel.errorConcepto != null,
             icon = FeatherIcons.Check,
-            errorMessage = viewModel.errorConcepto
+            errorMessage = viewModel.errorConcepto,
         )
 
         InputText(
@@ -67,6 +79,7 @@ fun FormularioGastos(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth(1f)
+                .imePadding()
         )
         {
             SubmitButton(

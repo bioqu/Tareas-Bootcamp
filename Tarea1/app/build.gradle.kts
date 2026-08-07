@@ -32,6 +32,7 @@ android {
     }
     buildFeatures {
         compose = true
+        viewBinding = true
     }
 }
 
@@ -44,6 +45,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.navigation.compose)
     implementation(libs.composeIcons.fontAwesome)
     implementation(libs.composeIcons.feather)
     implementation(libs.androidx.lifecycle.viewmodel.compose)

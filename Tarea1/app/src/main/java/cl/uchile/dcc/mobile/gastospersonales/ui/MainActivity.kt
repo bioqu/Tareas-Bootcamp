@@ -4,13 +4,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Icon
@@ -24,25 +17,29 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import compose.icons.FeatherIcons
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import cl.uchile.dcc.mobile.gastospersonales.ui.component.FigureIconButton
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import cl.uchile.dcc.mobile.gastospersonales.ui.screen.FormularioGastos
 import cl.uchile.dcc.mobile.gastospersonales.ui.screen.GastosMostrar
-import cl.uchile.dcc.mobile.gastospersonales.ui.screen.ScreenEnum
+import cl.uchile.dcc.mobile.gastospersonales.ui.screen.Screen
 import cl.uchile.dcc.mobile.gastospersonales.ui.theme.GastosPersonalesTheme
 import cl.uchile.dcc.mobile.gastospersonales.viewmodel.MainScreenViewModel
+import cl.uchile.dcc.mobile.gastospersonales.viewmodel.RegistryViewModel
 import compose.icons.feathericons.ArrowLeft
 import compose.icons.feathericons.Clipboard
 import compose.icons.feathericons.Plus
 
 class MainActivity : ComponentActivity() {
-    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -50,68 +47,112 @@ class MainActivity : ComponentActivity() {
         val viewModel = MainScreenViewModel()
         setContent {
             GastosPersonalesTheme {
-                Scaffold(
-                    topBar = {
-                        //TopAppBar TopBar con un titulo centrado y un iconbutton para  volver
-                        CenterAlignedTopAppBar(
-                            colors = TopAppBarDefaults.topAppBarColors(
-                                containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                                titleContentColor = MaterialTheme.colorScheme.secondary,
-                            ),
-                            title = {
-                                if (viewModel.actualScreen == ScreenEnum.REGISTRY) {
-                                    Text(
-                                        text = viewModel.actualScreen.title,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis
-                                    )
-                                }
-                            },
-                            navigationIcon = {
-                                IconButton(onClick = { /* do something */ }) {
-                                    Icon(
-                                        imageVector = FeatherIcons.ArrowLeft,
-                                        contentDescription = "Volver"
-                                    )
-                                }
-                            },
-                        )
-                    },
-                    bottomBar = {
-                            NavigationBar(
-                                windowInsets = NavigationBarDefaults.windowInsets
-                            ) {
-                                NavigationBarItem(
-                                    selected = viewModel.actualScreen == ScreenEnum.FORMULARIO,
-                                    onClick = { viewModel.changetoFormulario() },
-                                    icon = { Icon(FeatherIcons.Plus, contentDescription = ScreenEnum.FORMULARIO.title) },
-                                    label = { Text(ScreenEnum.FORMULARIO.title) }
-                                )
-                                NavigationBarItem(
-                                    selected = viewModel.actualScreen == ScreenEnum.REGISTRY,
-                                    onClick = { viewModel.changetoGastos() },
-                                    icon = { Icon(FeatherIcons.Clipboard, contentDescription = ScreenEnum.REGISTRY.title) },
-                                    label = { Text(ScreenEnum.REGISTRY.title) }
-                                )
-                            }
-                    },
-                    modifier = Modifier
-                        .fillMaxSize()
-                ) { innerPadding ->
-                    when (viewModel.actualScreen) {
-                        ScreenEnum.FORMULARIO -> FormularioGastos(
-                            modifier = Modifier.padding(innerPadding)
-                        )
-
-                        ScreenEnum.REGISTRY ->  GastosMostrar(
-                            modifier = Modifier.padding(innerPadding)
-                        )
-                    }
+                MainScreen()
+            }
         }
     }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MainScreen(screenViewModel: MainScreenViewModel = viewModel(), registryViewModel: RegistryViewModel = viewModel() ) {
+//    val actualScreen by remember { mutableStateOf(screenViewModel.actualScreen) }
+    val actualScreen = screenViewModel.actualScreen
+    val navController = rememberNavController() // El "jefe" de la navegación
+    // 1. Obtenemos la ruta actual del NavController para que la UI reaccione
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
+    Scaffold(
+        topBar = {
+            //TopAppBar TopBar con un titulo centrado y un iconbutton para  volver
+            CenterAlignedTopAppBar(
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.secondary,
+                ),
+                title = {
+                    val title = if (currentRoute == Screen.Historial.route)
+                        Screen.Historial.title else Screen.Formulario.title
+                    Text(text = title)
+                },
+                 //                {
+//                    if (actualScreen == ScreenEnum.REGISTRY) {
+//                        Text(
+//                            text = actualScreen.title,
+//                            maxLines = 1,
+//                            overflow = TextOverflow.Ellipsis
+//                        )
+//                    }
+//                },
+                // Icono de flecha izquierda para volver a la pantalla anterior, solo cuando estamos en el registro de gastos
+                navigationIcon = {
+                    if (currentRoute == Screen.Historial.route) {
+                        IconButton(onClick = { navController.navigateUp() }) {
+                            Icon(
+                                imageVector = FeatherIcons.ArrowLeft,
+                                contentDescription = "Volver"
+                            )
+                        }
+                    }
+                },
+            )
+        },
+        // Bottom con Iconos mostrando cada Pantalla: Formulario de gastos e Historial de Gastos
+        bottomBar = {
+            NavigationBar(
+                windowInsets = NavigationBarDefaults.windowInsets
+            ) {
+                NavigationBarItem(
+                    selected = currentRoute == Screen.Formulario.route,
+                    onClick = {
+                        // Navegamos y limpiamos el historial para no acumular pantallas
+                        navController.navigate(Screen.Formulario.route) {
+                            popUpTo(navController.graph.startDestinationId)
+                            launchSingleTop = true
+                        }
+                        screenViewModel.changeToFormulario()
+                    },
+                    icon = { Icon(FeatherIcons.Plus, contentDescription = "Formulario") },
+                    label = { Text("Agregar") }
+                )
+                NavigationBarItem(
+                    selected = currentRoute == Screen.Historial.route,
+                    onClick = {
+                        navController.navigate(Screen.Historial.route) {
+                            launchSingleTop = true }
+                        screenViewModel.changeToGastos()
+                    },
+                    icon = { Icon(FeatherIcons.Clipboard, contentDescription = "Historial") },
+                    label = { Text("Historial") }
+                )
+            }
+        },
+    ) { innerPadding ->
+        NavHost(
+            navController = navController,
+            startDestination = Screen.Formulario.route,
+            modifier = Modifier.padding(innerPadding)
+        ) {
+            composable(Screen.Formulario.route) {
+                FormularioGastos(viewModel = registryViewModel)
+            }
+            composable(Screen.Historial.route) {
+                GastosMostrar(viewModel = registryViewModel)
+            }
+        }
+//        when (actualScreen) {
+//            ScreenEnum.FORMULARIO -> FormularioGastos(
+//                modifier = Modifier.padding(innerPadding)
+//            )
+//
+//            ScreenEnum.REGISTRY ->  GastosMostrar(
+//                modifier = Modifier.padding(innerPadding)
+//            )
+//        }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable

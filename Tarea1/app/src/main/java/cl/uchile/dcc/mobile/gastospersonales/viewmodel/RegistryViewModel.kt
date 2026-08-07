@@ -49,6 +49,7 @@ class RegistryViewModel : ViewModel() {
             monto.isEmpty() -> "El monto debe contener solo números"
             monto.toIntOrNull() == null -> "Ingresa un monto válido"
             !esSoloNumeros(monto) -> "El monto debe contener solo números"
+            nuevoValor.length < 3 -> "Ingresar montos mayores a 100 $"
             else -> null
         }
     }
