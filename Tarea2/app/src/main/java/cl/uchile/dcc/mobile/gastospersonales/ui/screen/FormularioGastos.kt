@@ -13,11 +13,13 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cl.uchile.dcc.mobile.gastospersonales.ui.component.ScreenSpacer
 import cl.uchile.dcc.mobile.gastospersonales.ui.component.InputText
 import cl.uchile.dcc.mobile.gastospersonales.ui.component.SubmitButton
@@ -40,6 +42,8 @@ fun FormularioGastos(
     // Feedback usuario al ingresar gastos con snackbarHostState
     val scope = rememberCoroutineScope()
 
+    val state by viewModel.state.collectAsStateWithLifecycle()
+
     // Columna principal de la vista con verticalScrolling activado
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -61,21 +65,21 @@ fun FormularioGastos(
         // InputText de concepto de gasto
         InputText(
             label = "Concepto",
-            value = viewModel.concepto,
+            value = state.form.concepto,
             onValueChange = { viewModel.onChangeConcepto(it) },
-            isError = viewModel.errorConcepto != null,
+            isError = state.form.errorConcepto != null,
             icon = FeatherIcons.Check,
-            errorMessage = viewModel.errorConcepto
+            errorMessage = state.form.errorConcepto
         )
 
         // InputText de monto de gasto
         InputText(
             label = "Monto",
-            value = viewModel.monto,
+            value = state.form.monto,
             onValueChange = { viewModel.onChangeMonto(it) },
-            isError = viewModel.errorMonto != null,
+            isError = state.form.errorMonto != null,
             icon = FeatherIcons.DollarSign,
-            errorMessage = viewModel.errorMonto,
+            errorMessage = state.form.errorMonto,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
 
@@ -83,9 +87,9 @@ fun FormularioGastos(
         // Elevated Button
         SubmitButton(
             "GUARDAR",
-            enable = viewModel.isValidConcepto && viewModel.isValidMonto,
+            enable = state.form.errorMonto == null && state.form.errorConcepto == null,
             callBack = {
-                viewModel.addGasto(viewModel.concepto, viewModel.monto.toIntOrNull() ?: 0)
+                viewModel.addGasto()
                 // Se instancia snackbarHostState al presionar el button
                 scope.launch {
                     snackbarHostState.showSnackbar(
@@ -94,8 +98,6 @@ fun FormularioGastos(
                         duration = SnackbarDuration.Short
                     )
                 }
-                viewModel.resetConcepto() // Reset de OutlinedTextField para concepto
-                viewModel.resetMonto() // Reset de OutlinedTextField para monto
             }
         )
 

@@ -19,7 +19,9 @@ import cl.uchile.dcc.mobile.gastospersonales.viewmodel.RegistryViewModel
 // Genera Card() con la lista de gastos con concepto y monto en filas
 // GastosCard(gasto) Genera un Card() con concepto de gasto a lado izquierdo y al lado derecho monto
 @Composable
-fun GastosCard(gastos: GastosRegistry, viewModel: RegistryViewModel = viewModel()) {
+fun GastosCard(
+    gastos: GastosRegistry,
+    viewModel: RegistryViewModel = viewModel()) {
     Card(
         modifier = Modifier
             .fillMaxWidth()

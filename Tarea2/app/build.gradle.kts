@@ -47,6 +47,8 @@ dependencies {
     implementation(libs.composeIcons.fontAwesome)
     implementation(libs.composeIcons.feather)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.compose.material.icons.extended)
+    implementation(libs.androidx.navigation.compose)
 
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))

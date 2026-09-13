@@ -5,10 +5,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import cl.uchile.dcc.mobile.gastospersonales.ui.component.GastosCard
+import cl.uchile.dcc.mobile.gastospersonales.ui.screenstate.ExpenseEventState
 import cl.uchile.dcc.mobile.gastospersonales.viewmodel.RegistryViewModel
 
 // GastosMostrar()
@@ -16,9 +19,17 @@ import cl.uchile.dcc.mobile.gastospersonales.viewmodel.RegistryViewModel
 // siguiente formato: [Concepto          monto(numero en formato 1.000.000.$]
 @Composable
 fun GastosMostrar(
-    modifier: Modifier = Modifier.Companion,
+    modifier: Modifier = Modifier,
     viewModel: RegistryViewModel = viewModel()
 ) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+
+    // Extraemos la lista de gastos dependiendo del estado del evento
+    val listaDeGastos = when (val event = state.event) {
+        is ExpenseEventState.Success -> event.gastos
+        else -> emptyList() // Si está cargando, vacío o hay error, mostramos lista vacía por ahora
+    }
+
     // LazyColumn que albergara los gastos ingresados en la pantalla FormularioGastos.kt
     LazyColumn(
         modifier = modifier
@@ -26,7 +37,7 @@ fun GastosMostrar(
             .padding(8.dp),
         content = {
             items(
-                items = viewModel.gastos,
+                items = listaDeGastos,
                 key = { it.hashCode() } // opcional pero recomendado para mejor performance
             ) { gasto ->
                 // GastosCard genera un Card() con los gastos ordenados asi:

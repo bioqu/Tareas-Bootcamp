@@ -7,91 +7,107 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import cl.uchile.dcc.mobile.gastospersonales.model.GastosRegistry
+import cl.uchile.dcc.mobile.gastospersonales.ui.screenstate.ExpenseEventState
+import cl.uchile.dcc.mobile.gastospersonales.ui.screenstate.ExpenseFormState
+import cl.uchile.dcc.mobile.gastospersonales.ui.screenstate.ExpenseScreenState
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlin.collections.emptyList
 
 // RegistryViewModel :: viewModel()
 // Genera la lógica de concepto y monto
 class RegistryViewModel : ViewModel() {
-    // Definición de gastos como mutableStateListof de  GastosRegistry
-    val gastos = mutableStateListOf<GastosRegistry>()
 
-    // Definición de concepto de gasto y monto de gasto
-    var concepto by mutableStateOf("")
-    var monto by mutableStateOf("")
+    private val _state = MutableStateFlow(ExpenseScreenState())
+    val state: StateFlow<ExpenseScreenState> = _state.asStateFlow()
 
-    // Tratamiento de datos y errores relacionado a concepto de gasto
-    var errorConcepto by mutableStateOf<String?>(null)
-        private set
-
-    // onChangeConcepto contiene la lógica de los chequeos del dato que se va a ingresar como concepto en addGastos
     fun onChangeConcepto(nuevoValor: String) {
-        concepto = nuevoValor
-
-        errorConcepto = when {
-            nuevoValor.isBlank() || nuevoValor.isEmpty() -> "El concepto no puede estar vacío"
+        val error = when {
+            nuevoValor.isBlank() -> "El concepto no puede estar vacío"
             nuevoValor.length < 3 -> "El concepto debe tener más de 3 caracteres"
             else -> null
         }
-    }
 
-    // Implementación error de concepto en Gastos
-    val isValidConcepto: Boolean
-        get() = concepto.isNotEmpty() && errorConcepto == null
-
-    // Tratamiento de datos y errores relacionado a monto de gasto
-    // Implementación error de Monto en Gastos
-    var errorMonto by mutableStateOf<String?>(null)
-        private set
-
-
-    // Función auxiliar para verificar notificar al usuario que en el InputText de monto solo puede
-    // ingresar números
-    private fun esSoloNumeros(texto: String): Boolean {
-        return texto.toIntOrNull() != null
-    }
-
-    // onChangeMonto contiene la lógica de los chequeos del dato que se va a ingresar como monto en addGastos
-    fun onChangeMonto(nuevoValor: String) {
-        // Solo aceptar números (filtra lo que no sea dígito)
-        if (nuevoValor.isEmpty() || esSoloNumeros(nuevoValor)) {
-            monto = nuevoValor
+        _state.update { actual ->
+            actual.copy(
+                form = actual.form.copy(
+                    concepto = nuevoValor,
+                    errorConcepto = error
+                )
+            )
         }
-        // Errores de monto
-        errorMonto = when {
-            monto.isEmpty() -> "Ingresa un monto para tu gasto"
-            monto.toIntOrNull() == null -> "Ingresa un monto válido"
-            monto.toInt() < 100 -> "El monto debe ser mayor a 100$"
+    }
+
+    fun onChangeMonto(nuevoValor: String) {
+        val error = when {
+            nuevoValor.isBlank() -> "El monto no puede estar vacío"
+            nuevoValor.toIntOrNull() == null -> "El monto debe ser un número"
+            nuevoValor.toInt() <= 0 -> "El monto debe ser mayor a 0"
             else -> null
         }
+
+        _state.update { actual ->
+            actual.copy(
+                form = actual.form.copy(
+                    monto = nuevoValor,
+                    errorMonto = error
+                )
+            )
+        }
     }
 
-    // Estado con error
-    val isValidMonto: Boolean
-        get() = monto.isNotEmpty() && errorMonto == null
+    fun addGasto() {
+        val form = _state.value.form
+        val concepto = form.concepto.trim()
+        val monto = form.monto.toIntOrNull()
+
+        val errorConcepto = when {
+            concepto.isBlank() -> "El concepto no puede estar vacío"
+            concepto.length < 3 -> "El concepto debe tener más de 3 caracteres"
+            else -> null
+        }
+        val errorMonto = when {
+            form.monto.isBlank() -> "El monto no puede estar vacío"
+            monto == null -> "El monto debe ser un número entero"
+            monto < 0 -> "El monto debe ser mayor a 0"
+            else -> null
+        }
+
+        if (errorConcepto != null || errorMonto != null) {
+            _state.update {
+                it.copy(
+                    form = it.form.copy(
+                        errorConcepto = errorConcepto,
+                        errorMonto = errorMonto
+                    )
+                )
+            }
+            return
+        }
+
+        val actuales = when (val event = _state.value.event) {
+            is ExpenseEventState.Success -> event.gastos
+            else -> emptyList()
+        }
+
+        _state.update {
+            it.copy(
+                form = ExpenseFormState(),
+                event = ExpenseEventState.Success(
+                    gastos = actuales + GastosRegistry(
+                        concepto = concepto,
+                        monto = monto!!
+                    )
+                )
+            )
+        }
+    }
 
     // Formatear numero en monto de manera que aparezca en formato ###.###.###
     fun splitDigits(number: Int): String {
-        val formatter = android.icu.text.DecimalFormat("#,###")
+        val formatter = DecimalFormat("#,###")
         return formatter.format(number).replace(",", ".") // Forzamos el punto chileno
-    }
-
-    // Añadir Gasto
-    fun addGasto(concepto: String, monto: Int) {
-        val gasto = GastosRegistry(formatearEntrada(concepto), monto)
-        gastos.add(gasto)
-    }
-
-    // Funciones para resetear campos luego de ingresar información
-    fun resetConcepto() {
-        concepto = ""
-    }
-    fun resetMonto() {
-        monto = ""
-    }
-
-    // Formatear entrada de concepto para eliminar espacios a la izquierda, capitalizar y dejar el resto en lowercase
-    fun formatearEntrada(input: String): String {
-        return input.trim().lowercase().replaceFirstChar {
-            if (it.isLowerCase()) it.titlecase() else it.toString()
-        }
     }
 }
