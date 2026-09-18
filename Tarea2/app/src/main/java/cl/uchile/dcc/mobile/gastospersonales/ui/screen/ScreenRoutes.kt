@@ -13,7 +13,7 @@ enum class ScreenRoutes(
     FORMULARIO(
         title = "Formulario Gastos",
         route = "Formulario",
-        icon = Icons.Filled.AddToPhotos
+        icon = Icons.Filled.Add
     ),
 
     HISTORIAL(

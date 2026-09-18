@@ -12,7 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import cl.uchile.dcc.mobile.gastospersonales.ui.screen.ExpenseRegistryApp
-import cl.uchile.dcc.mobile.gastospersonales.ui.theme.GastosPersonalesTheme
+import com.example.compose.AppTheme
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -20,7 +20,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            GastosPersonalesTheme {
+            AppTheme() {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
@@ -29,15 +29,5 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-    }
-}
-
-
-
-@Preview(showBackground = true)
-@Composable
-fun FormularioGastosPreview() {
-    GastosPersonalesTheme {
-        TODO()
     }
 }

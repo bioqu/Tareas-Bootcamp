@@ -13,6 +13,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import cl.uchile.dcc.mobile.gastospersonales.ui.screen.ScreenRoutes
+import com.example.compose.primaryContainerLight
+import com.example.compose.primaryLight
+import com.example.compose.secondaryLight
+import com.example.compose.tertiaryContainerLight
+import com.example.compose.tertiaryDark
+import com.example.compose.tertiaryLight
 
 
 @Composable
@@ -24,19 +30,20 @@ fun BottomNavBar(
 ) {
     NavigationBar(
         modifier = modifier,
+        containerColor = primaryContainerLight,
         tonalElevation = 8.dp
     ) {
         val sections = listOf(
-            ScreenRoutes.HISTORIAL,
             ScreenRoutes.FORMULARIO,
+            ScreenRoutes.HISTORIAL,
         )
 
         sections.forEach { section ->
             NavigationBarItem(
                 selected = currentRoute == section.route,
                 onClick = { onNavigateTo(section.route) },
-                icon = { Icon(section.icon, contentDescription = section.title) },
-                label = { Text(section.title) },
+                icon = { Icon(section.icon, contentDescription = section.title, tint = secondaryLight) },
+                label = { Text(text = section.title, color = primaryLight) },
             )
         }
     }
