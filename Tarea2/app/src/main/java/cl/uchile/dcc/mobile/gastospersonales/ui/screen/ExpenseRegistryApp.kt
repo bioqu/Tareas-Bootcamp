@@ -29,6 +29,9 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.composable
 import androidx.compose.runtime.getValue
+import androidx.datastore.dataStore
+import cl.uchile.dcc.mobile.gastospersonales.model.database.ExpenseDataRepository
+import cl.uchile.dcc.mobile.gastospersonales.model.repository.GastosAppRepository
 import cl.uchile.dcc.mobile.gastospersonales.ui.component.BottomNavBar
 import cl.uchile.dcc.mobile.gastospersonales.viewmodel.RegistryViewModel
 
@@ -53,7 +56,6 @@ fun ExpenseRegistryApp(screenViewModel: RegistryViewModel = viewModel()) {
 
     // Se crea variable para registrar si el teclado esta presente en pantalla
     val isKeyboardOpen = WindowInsets.ime.getBottom(density) > 0
-
 
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },

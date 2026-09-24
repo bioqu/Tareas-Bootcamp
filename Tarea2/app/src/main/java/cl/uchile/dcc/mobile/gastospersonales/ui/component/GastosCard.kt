@@ -21,7 +21,8 @@ import cl.uchile.dcc.mobile.gastospersonales.viewmodel.RegistryViewModel
 @Composable
 fun GastosCard(
     gastos: GastosRegistry,
-    viewModel: RegistryViewModel = viewModel()) {
+    viewModel: RegistryViewModel)
+{
     Card(
         modifier = Modifier
             .fillMaxWidth()

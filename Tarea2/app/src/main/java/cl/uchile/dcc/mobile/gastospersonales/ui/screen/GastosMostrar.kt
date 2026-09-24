@@ -38,11 +38,11 @@ fun GastosMostrar(
         content = {
             items(
                 items = listaDeGastos,
-                key = { it.hashCode() } // opcional pero recomendado para mejor performance
+                key = { it.id } // opcional pero recomendado para mejor performance
             ) { gasto ->
                 // GastosCard genera un Card() con los gastos ordenados asi:
                 // concepto de gasto a lado izquierdo y al lado derecho monto
-                GastosCard(gasto) // pasa el ítem individual, no toda la lista
+                GastosCard(gastos = gasto, viewModel = viewModel) // pasa el ítem individual, no toda la lista
             }
         }
     )
