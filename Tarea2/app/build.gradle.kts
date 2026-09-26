@@ -44,6 +44,10 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.room3.common.jvm)
+    implementation(libs.androidx.room3.runtime)
+    implementation(libs.androidx.room3.compiler)
+
     implementation(libs.composeIcons.fontAwesome)
     implementation(libs.composeIcons.feather)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
@@ -60,4 +64,8 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
+}
+
+configurations.configureEach {
+    exclude(group = "com.intellij", module = "annotations")
 }

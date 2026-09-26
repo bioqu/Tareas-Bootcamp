@@ -29,9 +29,6 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.composable
 import androidx.compose.runtime.getValue
-import androidx.datastore.dataStore
-import cl.uchile.dcc.mobile.gastospersonales.model.database.ExpenseDataRepository
-import cl.uchile.dcc.mobile.gastospersonales.model.repository.GastosAppRepository
 import cl.uchile.dcc.mobile.gastospersonales.ui.component.BottomNavBar
 import cl.uchile.dcc.mobile.gastospersonales.viewmodel.RegistryViewModel
 

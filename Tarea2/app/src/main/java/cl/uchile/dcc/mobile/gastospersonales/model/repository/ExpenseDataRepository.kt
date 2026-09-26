@@ -1,8 +1,9 @@
-package cl.uchile.dcc.mobile.gastospersonales.model.database
+package cl.uchile.dcc.mobile.gastospersonales.model.repository
 
 import android.content.ContentValues
 import android.content.Context
 import cl.uchile.dcc.mobile.gastospersonales.model.GastosRegistry
+import cl.uchile.dcc.mobile.gastospersonales.model.database_open_helper.ExpenseOpenHelper
 
 class ExpenseDataRepository(
     private val context: Context
@@ -80,4 +81,3 @@ class ExpenseDataRepository(
     }
 
 }
-

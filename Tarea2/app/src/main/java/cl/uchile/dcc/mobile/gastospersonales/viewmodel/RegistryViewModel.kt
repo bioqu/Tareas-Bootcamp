@@ -1,14 +1,11 @@
 package cl.uchile.dcc.mobile.gastospersonales.viewmodel
 
-import android.app.AlertDialog
-import android.app.Dialog
 import android.icu.text.DecimalFormat
-import android.os.Bundle
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cl.uchile.dcc.mobile.gastospersonales.model.GastosRegistry
-import cl.uchile.dcc.mobile.gastospersonales.model.database.ExpenseDataRepository
+import cl.uchile.dcc.mobile.gastospersonales.model.repository.ExpenseDataRepository
 import cl.uchile.dcc.mobile.gastospersonales.model.repository.GastosAppRepository
 import cl.uchile.dcc.mobile.gastospersonales.ui.screenstate.ExpenseEventState
 import cl.uchile.dcc.mobile.gastospersonales.ui.screenstate.ExpenseFormState
@@ -181,19 +178,6 @@ class RegistryViewModel(
                 form = ExpenseFormState()
             )
         }
-
-//        _state.update {
-//            it.copy(
-//                form = ExpenseFormState(),
-//                event = ExpenseEventState.Success(
-//                    gastos = actuales + GastosRegistry(
-//                        id = java.util.UUID.randomUUID().toString(), // Genera un ID único,
-//                        concepto = concepto,
-//                        monto = monto!!
-//                    )
-//                )
-//            )
-//        }
     }
 
     // Eliminar un gasto

@@ -1,4 +1,4 @@
-package cl.uchile.dcc.mobile.gastospersonales.model.database
+package cl.uchile.dcc.mobile.gastospersonales.model.database_open_helper
 
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
