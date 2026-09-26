@@ -31,9 +31,23 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import cl.uchile.dcc.mobile.gastospersonales.viewmodel.RegistryViewModel
 import kotlinx.coroutines.launch
 
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+
 // FormularioGastos()
 // Crea la pantalla para ingreso de gastos con dos OutlinedTextField uno para concepto y otro para
-// monto con un boton que completa la funcion de agregar
+// monto con un button que completa la función de agregar
 @Composable
 fun FormularioGastos(
     modifier: Modifier = Modifier,
@@ -44,6 +58,53 @@ fun FormularioGastos(
     val scope = rememberCoroutineScope()
 
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val userName by viewModel.userName.collectAsStateWithLifecycle()
+
+    var showNameDialog by remember { mutableStateOf(false) }
+    var tempNameInput by remember { mutableStateOf("") }
+
+    // Si el usuario aún no ingresa su nombre (es default "Invitado" o vacío), mostramos el diálogo inicial
+    val shouldShowInitialDialog = userName == "Invitado" || userName.isBlank()
+
+    if (shouldShowInitialDialog || showNameDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                if (!shouldShowInitialDialog) {
+                    showNameDialog = false
+                }
+            },
+            title = {
+                Text(text = if (shouldShowInitialDialog) "¡Bienvenido!" else "Editar Nombre")
+            },
+            text = {
+                Column {
+                    Text(text = "Por favor, ingresa tu nombre:")
+                    Spacer(modifier = Modifier.height(8.dp))
+                    OutlinedTextField(
+                        value = tempNameInput,
+                        onValueChange = { tempNameInput = it },
+                        label = { Text("Nombre") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        if (tempNameInput.isNotBlank()) {
+                            viewModel.setUserName(tempNameInput.trim())
+                            showNameDialog = false
+                            tempNameInput = ""
+                        }
+                    },
+                    enabled = tempNameInput.isNotBlank()
+                ) {
+                    Text("Guardar")
+                }
+            }
+        )
+    }
 
     // Columna principal de la vista con verticalScrolling activado
     Column(

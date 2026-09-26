@@ -1,11 +1,10 @@
 package cl.uchile.dcc.mobile.gastospersonales.model.database
 
-import androidx.room3.Dao
-import androidx.room3.Delete
-import androidx.room3.Insert
-import androidx.room3.Query
-import androidx.room3.Update
-import cl.uchile.dcc.mobile.gastospersonales.model.GastosRegistry
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.Query
+import androidx.room.Update
 
 @Dao
 interface ExpenseRegistryDAO {
@@ -18,7 +17,7 @@ interface ExpenseRegistryDAO {
     suspend fun getAllGastosRegistry(): List<GastosRegistry>
 
     @Query("SELECT * FROM GastosRegistry WHERE id = :id")
-    suspend fun getOneGastosRegistry(): List<GastosRegistry>
+    suspend fun getOneGastosRegistry(id: String): List<GastosRegistry>
 
     // UPDATE
     @Update

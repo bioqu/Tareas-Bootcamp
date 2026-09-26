@@ -32,6 +32,22 @@ import androidx.compose.runtime.getValue
 import cl.uchile.dcc.mobile.gastospersonales.ui.component.BottomNavBar
 import cl.uchile.dcc.mobile.gastospersonales.viewmodel.RegistryViewModel
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.LightMode
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExpenseRegistryApp(screenViewModel: RegistryViewModel = viewModel()) {
@@ -48,6 +64,52 @@ fun ExpenseRegistryApp(screenViewModel: RegistryViewModel = viewModel()) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
+    // Estados de Usuario y tema
+    val currentTheme by screenViewModel.appTheme.collectAsStateWithLifecycle()
+    val userName by screenViewModel.userName.collectAsStateWithLifecycle()
+
+    var showEditNameDialog by remember { mutableStateOf(false) }
+    var tempNameInput by remember { mutableStateOf("") }
+
+    // Diálogo para editar el nombre de usuario
+    if (showEditNameDialog) {
+        AlertDialog(
+            onDismissRequest = { showEditNameDialog = false },
+            title = { Text(text = "Editar Nombre") },
+            text = {
+                Column {
+                    Text(text = "Ingresa tu nuevo nombre:")
+                    Spacer(modifier = Modifier.height(8.dp))
+                    OutlinedTextField(
+                        value = tempNameInput,
+                        onValueChange = { tempNameInput = it },
+                        label = { Text("Nombre") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        if (tempNameInput.isNotBlank()) {
+                            screenViewModel.setUserName(tempNameInput.trim())
+                            showEditNameDialog = false
+                        }
+                    },
+                    enabled = tempNameInput.isNotBlank()
+                ) {
+                    Text("Guardar")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showEditNameDialog = false }) {
+                    Text("Cancelar")
+                }
+            }
+        )
+    }
+
     // CurrentScreen
     val currentScreen = ScreenRoutes.entries.find { it.route == currentRoute } ?: ScreenRoutes.FORMULARIO
 
@@ -57,31 +119,52 @@ fun ExpenseRegistryApp(screenViewModel: RegistryViewModel = viewModel()) {
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
-            if (currentScreen == ScreenRoutes.HISTORIAL) {
-                //CentralTopAppBar TopBar con un titulo centrado y un iconbutton para  volver
-                CenterAlignedTopAppBar(
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                        titleContentColor = MaterialTheme.colorScheme.secondary,
-                    ),
-                    title = {
-
-                        Text(
-                            text = currentScreen.title,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    },
-                    navigationIcon = {
+            CenterAlignedTopAppBar(
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.secondary,
+                ),
+                title = {
+                    Text(
+                        text = if (currentScreen == ScreenRoutes.FORMULARIO) {
+                            if (userName.isBlank() || userName == "Invitado") "Gastos Personales" else "Hola, $userName"
+                        } else {
+                            currentScreen.title
+                        },
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                },
+                navigationIcon = {
+                    if (currentScreen == ScreenRoutes.HISTORIAL) {
                         IconButton(onClick = { navController.popBackStack() }) {
                             Icon(
                                 imageVector = FeatherIcons.ArrowLeft,
                                 contentDescription = "Volver"
                             )
                         }
-                    },
-                )
-            }
+                    }
+                },
+                actions = {
+                    // Botón para editar el nombre de usuario
+                    IconButton(onClick = {
+                        tempNameInput = if (userName == "Invitado") "" else userName
+                        showEditNameDialog = true
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = "Editar nombre"
+                        )
+                    }
+                    // Botón para cambiar tema
+                    IconButton(onClick = { screenViewModel.toggleTheme() }) {
+                        Icon(
+                            imageVector = if (currentTheme == "Oscuro") Icons.Default.LightMode else Icons.Default.DarkMode,
+                            contentDescription = "Cambiar tema"
+                        )
+                    }
+                }
+            )
         },
         bottomBar = {
             // Condicional

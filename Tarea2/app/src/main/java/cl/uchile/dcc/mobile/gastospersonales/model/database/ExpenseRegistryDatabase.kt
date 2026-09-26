@@ -1,14 +1,9 @@
 package cl.uchile.dcc.mobile.gastospersonales.model.database
 
 import android.content.Context
-import androidx.room3.Database
-import androidx.room3.Room.databaseBuilder
-import androidx.room3.RoomDatabase
-import androidx.room3.migration.Migration
-import androidx.sqlite.SQLiteConnection
-import androidx.sqlite.execSQL
-
-import cl.uchile.dcc.mobile.gastospersonales.model.GastosRegistry
+import androidx.room.Database
+import androidx.room.Room.databaseBuilder
+import androidx.room.RoomDatabase
 
 @Database(
     entities = [GastosRegistry::class],

@@ -14,7 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import cl.uchile.dcc.mobile.gastospersonales.model.GastosRegistry
+import cl.uchile.dcc.mobile.gastospersonales.model.database.GastosRegistry
 import cl.uchile.dcc.mobile.gastospersonales.viewmodel.RegistryViewModel
 
 // GastosCard :: gastos -> Card()

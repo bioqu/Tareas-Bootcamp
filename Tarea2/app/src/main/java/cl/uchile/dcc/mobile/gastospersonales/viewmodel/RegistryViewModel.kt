@@ -4,7 +4,7 @@ import android.icu.text.DecimalFormat
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import cl.uchile.dcc.mobile.gastospersonales.model.GastosRegistry
+import cl.uchile.dcc.mobile.gastospersonales.model.database.GastosRegistry
 import cl.uchile.dcc.mobile.gastospersonales.model.repository.ExpenseDataRepository
 import cl.uchile.dcc.mobile.gastospersonales.model.repository.GastosAppRepository
 import cl.uchile.dcc.mobile.gastospersonales.ui.screenstate.ExpenseEventState
@@ -56,18 +56,20 @@ class RegistryViewModel(
         )
 
     fun changeTheme(theme: String) {
-        var theme = appTheme.value
-        when(theme) {
-            "Auto" -> theme = "Claro"
-            "Claro" -> theme = "Oscuro"
-            "Oscuro" -> theme = "Claro"
-        }
         viewModelScope.launch {
             configRepo.setTheme(theme)
         }
     }
 
-    val userName: StateFlow<String> = configRepo.theme
+    fun toggleTheme() {
+        val current = appTheme.value
+        val newTheme = if (current == "Oscuro") "Claro" else "Oscuro"
+        viewModelScope.launch {
+            configRepo.setTheme(newTheme)
+        }
+    }
+
+    val userName: StateFlow<String> = configRepo.name
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
@@ -155,18 +157,21 @@ class RegistryViewModel(
             return
         }
 
-        // Se crea instancia de GastosRegistry
+        // Se crea la instancia de GastosRegistry con ID único
         val nuevoGasto = GastosRegistry(
-            id = "0", // SQLite genera el número ID
+            id = System.currentTimeMillis().toString(), // Generamos una ID única
             concepto = concepto,
             monto = monto!!
         )
 
-        // Guardamos en la base de datos
-        dataRepo.addGastosRegistry(nuevoGasto)
+        // Se ejecuta dentro de corrutina porque addGastosRegistry es suspend
+        viewModelScope.launch {
+            // Guardamos en la base de datos a través del repositorio
+            dataRepo.addGastosRegistry(nuevoGasto)
 
-        // Actualizamos la lista cargada
-        cargarGastos()
+            // Actualizamos la lista cargada desde la BD
+            cargarGastos()
+        }
 
         // Se limpia l SavedStateHandle
         savedStateHandle[KEY_CONCEPTO] = ""
@@ -182,32 +187,31 @@ class RegistryViewModel(
 
     // Eliminar un gasto
     fun deleteGasto(gasto: GastosRegistry) {
-        // Eliminar el registro en SQLite con deleteGastosRegistry
-        dataRepo.deleteGastosRegistry(gasto)
+        viewModelScope.launch {
+            // Eliminar el registro en Room a través del repositorio
+            dataRepo.deleteGastosRegistry(gasto)
 
-        // Volver a cargar la lista en el _state para refrescar la pantalla automáticamente
-        cargarGastos()
-    }
-
-    fun getGastosRegistry(): List<GastosRegistry> {
-        return dataRepo.getAllGastosRepository()
+            // Volver a cargar la lista en el _state para refrescar la pantalla
+            cargarGastos()
+        }
     }
 
     // Cargar Gastos en lista desde BD
     fun cargarGastos() {
-        val lista = dataRepo.getAllGastosRepository()
-        _state.update {
-            it.copy(
-                event = if (lista.isEmpty()) {
-                    ExpenseEventState.Empty
-                } else {
-                    ExpenseEventState.Success(lista)
-                }
-            )
+        viewModelScope.launch {
+            // getAllGastosRepository() también es suspend
+            val lista = dataRepo.getAllGastosRepository()
+            _state.update {
+                it.copy(
+                    event = if (lista.isEmpty()) {
+                        ExpenseEventState.Empty
+                    } else {
+                        ExpenseEventState.Success(lista)
+                    }
+                )
+            }
         }
     }
-
-
 
     // Formatear numero en monto de manera que aparezca en formato ###.###.###
     fun splitDigits(number: Int): String {

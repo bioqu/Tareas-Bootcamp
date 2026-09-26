@@ -30,7 +30,7 @@ fun BottomNavBar(
 ) {
     NavigationBar(
         modifier = modifier,
-        containerColor = primaryContainerLight,
+        containerColor = MaterialTheme.colorScheme.secondaryContainer,
         tonalElevation = 8.dp
     ) {
         val sections = listOf(
@@ -42,8 +42,8 @@ fun BottomNavBar(
             NavigationBarItem(
                 selected = currentRoute == section.route,
                 onClick = { onNavigateTo(section.route) },
-                icon = { Icon(section.icon, contentDescription = section.title, tint = secondaryLight) },
-                label = { Text(text = section.title, color = primaryLight) },
+                icon = { Icon(section.icon, contentDescription = section.title, tint = MaterialTheme.colorScheme.secondary) },
+                label = { Text(text = section.title, color = MaterialTheme.colorScheme.secondary) },
             )
         }
     }

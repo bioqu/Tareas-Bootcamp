@@ -1,8 +1,8 @@
-package cl.uchile.dcc.mobile.gastospersonales.model
+package cl.uchile.dcc.mobile.gastospersonales.model.database
 
-import androidx.room3.ColumnInfo
-import androidx.room3.Entity
-import androidx.room3.PrimaryKey
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
 @Entity(tableName = "GastosRegistry")
 data class GastosRegistry(

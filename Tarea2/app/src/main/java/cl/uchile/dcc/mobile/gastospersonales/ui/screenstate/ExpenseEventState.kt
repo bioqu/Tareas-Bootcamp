@@ -1,6 +1,6 @@
 package cl.uchile.dcc.mobile.gastospersonales.ui.screenstate
 
-import cl.uchile.dcc.mobile.gastospersonales.model.GastosRegistry
+import cl.uchile.dcc.mobile.gastospersonales.model.database.GastosRegistry
 
 sealed class ExpenseEventState {
     object Loading : ExpenseEventState()
