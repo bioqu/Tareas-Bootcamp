@@ -13,7 +13,6 @@ class ExpenseDataRepository(
     fun addGastosRegistry(gastosRegistry: GastosRegistry) {
         val db = dbHelper.writableDatabase
         val values = ContentValues().apply {
-            put("_id", gastosRegistry.id)
             put("concepto", gastosRegistry.concepto)
             put("monto", gastosRegistry.monto)
         }
@@ -23,7 +22,7 @@ class ExpenseDataRepository(
 
     // READ del crud
     fun getAllGastosRepository(): List<GastosRegistry> {
-        val gatosRegistryList = mutableListOf< GastosRegistry>()
+        val gatosRegistryList = mutableListOf<GastosRegistry>()
         val db = dbHelper.readableDatabase
         val cursor = db.query(
             ExpenseOpenHelper.TABLE_GASTOS_REGISTRY,  // Tabla
@@ -53,6 +52,32 @@ class ExpenseDataRepository(
 
     // UPDATE del crud
     fun updateGastosRepository(gastosRegistry: GastosRegistry) {
+        val db = dbHelper.writableDatabase
+        val values = ContentValues().apply {
+            put("concepto", gastosRegistry.concepto)
+            put ("_id", gastosRegistry.id)
+            put("concepto", gastosRegistry.concepto)
+        }
+        db.update(
+            ExpenseOpenHelper.TABLE_GASTOS_REGISTRY,
+            values,
+            "_id = >",
+            arrayOf(gastosRegistry.id)
+        )
+        db.close()
 
     }
+
+    // DELETE del crud
+    fun deleteGastosRegistry(gastosRegistry: GastosRegistry) {
+        val db = dbHelper.writableDatabase
+        db.delete(
+            ExpenseOpenHelper.TABLE_GASTOS_REGISTRY,
+            "_id = ?",
+            arrayOf(gastosRegistry.id)
+        )
+        db.close()
+    }
+
 }
+

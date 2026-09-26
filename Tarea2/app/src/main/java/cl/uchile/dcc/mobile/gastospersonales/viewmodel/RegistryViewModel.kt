@@ -1,10 +1,14 @@
 package cl.uchile.dcc.mobile.gastospersonales.viewmodel
 
+import android.app.AlertDialog
+import android.app.Dialog
 import android.icu.text.DecimalFormat
+import android.os.Bundle
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cl.uchile.dcc.mobile.gastospersonales.model.GastosRegistry
+import cl.uchile.dcc.mobile.gastospersonales.model.database.ExpenseDataRepository
 import cl.uchile.dcc.mobile.gastospersonales.model.repository.GastosAppRepository
 import cl.uchile.dcc.mobile.gastospersonales.ui.screenstate.ExpenseEventState
 import cl.uchile.dcc.mobile.gastospersonales.ui.screenstate.ExpenseFormState
@@ -16,12 +20,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlin.collections.emptyList
 
 // RegistryViewModel :: viewModel()
 // Genera la lógica de concepto y monto
 class RegistryViewModel(
     private val configRepo: GastosAppRepository,
+    private val dataRepo: ExpenseDataRepository,
     private val savedStateHandle: SavedStateHandle = SavedStateHandle()
 ) : ViewModel() {
 
@@ -123,11 +127,13 @@ class RegistryViewModel(
         }
     }
 
+    //Añadir Gastos
     fun addGasto() {
         val form = _state.value.form
         val concepto = form.concepto.trim()
         val monto = form.monto.toIntOrNull()
 
+        // Validación de monto y concepto en formulario
         val errorConcepto = when {
             concepto.isBlank() -> "El concepto no puede estar vacío"
             concepto.length < 3 -> "El concepto debe tener más de 3 caracteres"
@@ -152,28 +158,72 @@ class RegistryViewModel(
             return
         }
 
-        val actuales = when (val event = _state.value.event) {
-            is ExpenseEventState.Success -> event.gastos
-            else -> emptyList()
-        }
+        // Se crea instancia de GastosRegistry
+        val nuevoGasto = GastosRegistry(
+            id = "0", // SQLite genera el número ID
+            concepto = concepto,
+            monto = monto!!
+        )
 
-        // Limpiamos los valores guardados en el handle ya que el formulario se vacía
+        // Guardamos en la base de datos
+        dataRepo.addGastosRegistry(nuevoGasto)
+
+        // Actualizamos la lista cargada
+        cargarGastos()
+
+        // Se limpia l SavedStateHandle
         savedStateHandle[KEY_CONCEPTO] = ""
         savedStateHandle[KEY_MONTO] = ""
 
+        // Se limpia formulario en el UI State
         _state.update {
             it.copy(
-                form = ExpenseFormState(),
-                event = ExpenseEventState.Success(
-                    gastos = actuales + GastosRegistry(
-                        id = java.util.UUID.randomUUID().toString(), // Genera un ID único,
-                        concepto = concepto,
-                        monto = monto!!
-                    )
-                )
+                form = ExpenseFormState()
+            )
+        }
+
+//        _state.update {
+//            it.copy(
+//                form = ExpenseFormState(),
+//                event = ExpenseEventState.Success(
+//                    gastos = actuales + GastosRegistry(
+//                        id = java.util.UUID.randomUUID().toString(), // Genera un ID único,
+//                        concepto = concepto,
+//                        monto = monto!!
+//                    )
+//                )
+//            )
+//        }
+    }
+
+    // Eliminar un gasto
+    fun deleteGasto(gasto: GastosRegistry) {
+        // Eliminar el registro en SQLite con deleteGastosRegistry
+        dataRepo.deleteGastosRegistry(gasto)
+
+        // Volver a cargar la lista en el _state para refrescar la pantalla automáticamente
+        cargarGastos()
+    }
+
+    fun getGastosRegistry(): List<GastosRegistry> {
+        return dataRepo.getAllGastosRepository()
+    }
+
+    // Cargar Gastos en lista desde BD
+    fun cargarGastos() {
+        val lista = dataRepo.getAllGastosRepository()
+        _state.update {
+            it.copy(
+                event = if (lista.isEmpty()) {
+                    ExpenseEventState.Empty
+                } else {
+                    ExpenseEventState.Success(lista)
+                }
             )
         }
     }
+
+
 
     // Formatear numero en monto de manera que aparezca en formato ###.###.###
     fun splitDigits(number: Int): String {

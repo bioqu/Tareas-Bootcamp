@@ -29,7 +29,9 @@ class ExpenseOpenHelper(context: Context): SQLiteOpenHelper(
     ) {
         if(newversion > oldversion){
             Log.d("ExpenseOpenHelper", "Actualizando de v$oldversion a $newversion")
-            //
+            // Cambio de versión
+            db?.execSQL("DROP TABLE IF EXISTS $TABLE_GASTOS_REGISTRY")
+            onCreate(db)
         }
     }
 

@@ -52,7 +52,10 @@ class MainActivity : ComponentActivity() {
 //            )
 //        )
 
-        viewModel = RegistryViewModel(configRepo)
+        viewModel = RegistryViewModel(
+            configRepo,
+            configDatabase
+        )
 
         setContent {
             // Estado del tema actual
