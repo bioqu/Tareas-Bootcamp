@@ -1,5 +1,7 @@
 package cl.uchile.dcc.mobile.gastospersonales.ui.screen
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -41,12 +43,20 @@ import androidx.compose.runtime.setValue
 // FormularioGastos()
 // Crea la pantalla para ingreso de gastos con dos OutlinedTextField uno para concepto y otro para
 // monto con un button que completa la función de agregar
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun FormularioGastos(
     modifier: Modifier = Modifier,
     viewModel: RegistryViewModel = viewModel(),
     snackbarHostState: SnackbarHostState
 ) {
+    val maxDiario by viewModel.maxDiario.collectAsStateWithLifecycle()
+    val totalHoy by viewModel.totalHoy.collectAsStateWithLifecycle()
+
+    if (maxDiario > 0) {
+        Text("Hoy: ${viewModel.splitDigits(totalHoy)} / ${viewModel.splitDigits(maxDiario)}")
+    }
+
     // Feedback usuario al ingresar gastos con snackbarHostState
     val scope = rememberCoroutineScope()
 

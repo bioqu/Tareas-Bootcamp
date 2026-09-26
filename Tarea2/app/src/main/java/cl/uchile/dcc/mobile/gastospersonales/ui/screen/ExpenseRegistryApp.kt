@@ -1,5 +1,7 @@
 package cl.uchile.dcc.mobile.gastospersonales.ui.screen
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.ime
@@ -37,6 +39,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AttachMoney
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.LightMode
@@ -48,6 +51,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExpenseRegistryApp(screenViewModel: RegistryViewModel = viewModel()) {
@@ -70,6 +74,13 @@ fun ExpenseRegistryApp(screenViewModel: RegistryViewModel = viewModel()) {
 
     var showEditNameDialog by remember { mutableStateOf(false) }
     var tempNameInput by remember { mutableStateOf("") }
+
+    // Máximo Gasto Diario
+    var showMaxDialog by remember { mutableStateOf(false) }
+    var tempMaxInput by remember { mutableStateOf("") }
+
+    val maxDiario by screenViewModel.maxDiario.collectAsStateWithLifecycle()
+    val totalHoy by screenViewModel.totalHoy.collectAsStateWithLifecycle()
 
     // Diálogo para editar el nombre de usuario
     if (showEditNameDialog) {
@@ -104,6 +115,37 @@ fun ExpenseRegistryApp(screenViewModel: RegistryViewModel = viewModel()) {
             },
             dismissButton = {
                 TextButton(onClick = { showEditNameDialog = false }) {
+                    Text("Cancelar")
+                }
+            }
+        )
+    }
+
+    // Diálogo Maximo Valor diario
+    if (showMaxDialog) {
+        AlertDialog(
+            onDismissRequest = { showMaxDialog = false },
+            title = { Text("Gasto máximo diario") },
+            text = {
+                OutlinedTextField(
+                    value = tempMaxInput,
+                    onValueChange = { tempMaxInput = it.filter { c -> c.isDigit() } },
+                    label = { Text("Monto máximo (0 = sin tope)") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        val valor = tempMaxInput.toIntOrNull() ?: 0
+                        screenViewModel.setMaxDiario(valor)
+                        showMaxDialog = false
+                    }
+                ) { Text("Guardar") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showMaxDialog = false }) {
                     Text("Cancelar")
                 }
             }
@@ -161,6 +203,24 @@ fun ExpenseRegistryApp(screenViewModel: RegistryViewModel = viewModel()) {
                         Icon(
                             imageVector = if (currentTheme == "Oscuro") Icons.Default.LightMode else Icons.Default.DarkMode,
                             contentDescription = "Cambiar tema"
+                        )
+                    }
+                    // Máximo Diario
+                    if (maxDiario <= 0) {
+                        IconButton(onClick = {
+                            tempMaxInput = ""
+                            showMaxDialog = true
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.AttachMoney,
+                                contentDescription = "Definir gasto máximo diario"
+                            )
+                        }
+                    } else {
+                        Text(
+                            text = "${screenViewModel.splitDigits(totalHoy)} / ${screenViewModel.splitDigits(maxDiario)}",
+                            modifier = Modifier.padding(end = 8.dp),
+                            maxLines = 1
                         )
                     }
                 }

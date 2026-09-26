@@ -12,5 +12,7 @@ data class GastosRegistry(
     @ColumnInfo(name = "concepto")
     var concepto: String,
     @ColumnInfo(name = "monto")
-    var monto: Int
+    var monto: Int,
+    @ColumnInfo(name = "fecha")
+    val fecha: Long = System.currentTimeMillis()
 )

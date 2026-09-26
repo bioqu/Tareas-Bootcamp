@@ -1,6 +1,8 @@
 package cl.uchile.dcc.mobile.gastospersonales.viewmodel
 
 import android.icu.text.DecimalFormat
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -17,6 +19,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.stateIn
+import java.time.LocalDate
+import java.time.ZoneId
 
 // RegistryViewModel :: viewModel()
 // Genera la lógica de concepto y monto
@@ -127,12 +132,12 @@ class RegistryViewModel(
     }
 
     //Añadir Gastos
+    @RequiresApi(Build.VERSION_CODES.O)
     fun addGasto() {
         val form = _state.value.form
         val concepto = form.concepto.trim()
         val monto = form.monto.toIntOrNull()
 
-        // Validación de monto y concepto en formulario
         val errorConcepto = when {
             concepto.isBlank() -> "El concepto no puede estar vacío"
             concepto.length < 3 -> "El concepto debe tener más de 3 caracteres"
@@ -141,7 +146,7 @@ class RegistryViewModel(
         val errorMonto = when {
             form.monto.isBlank() -> "El monto no puede estar vacío"
             monto == null -> "El monto debe ser un número entero"
-            monto < 0 -> "El monto debe ser mayor a 0"
+            monto <= 0 -> "El monto debe ser mayor a 0"
             else -> null
         }
 
@@ -157,31 +162,30 @@ class RegistryViewModel(
             return
         }
 
-        // Se crea la instancia de GastosRegistry con ID único
-        val nuevoGasto = GastosRegistry(
-            id = System.currentTimeMillis().toString(), // Generamos una ID única
-            concepto = concepto,
-            monto = monto!!
-        )
-
-        // Se ejecuta dentro de corrutina porque addGastosRegistry es suspend
         viewModelScope.launch {
-            // Guardamos en la base de datos a través del repositorio
-            dataRepo.addGastosRegistry(nuevoGasto)
+            if (!puedeAgregar(monto!!)) {
+                _state.update {
+                    it.copy(
+                        form = it.form.copy(
+                            errorMonto = "Superaste el gasto máximo del día"
+                        )
+                    )
+                }
+                return@launch
+            }
 
-            // Actualizamos la lista cargada desde la BD
-            cargarGastos()
-        }
-
-        // Se limpia l SavedStateHandle
-        savedStateHandle[KEY_CONCEPTO] = ""
-        savedStateHandle[KEY_MONTO] = ""
-
-        // Se limpia formulario en el UI State
-        _state.update {
-            it.copy(
-                form = ExpenseFormState()
+            val nuevoGasto = GastosRegistry(
+                id = System.currentTimeMillis().toString(),
+                concepto = concepto,
+                monto = monto
             )
+
+            dataRepo.addGastosRegistry(nuevoGasto)
+            cargarGastos()
+
+            savedStateHandle[KEY_CONCEPTO] = ""
+            savedStateHandle[KEY_MONTO] = ""
+            _state.update { it.copy(form = ExpenseFormState()) }
         }
     }
 
@@ -217,5 +221,43 @@ class RegistryViewModel(
     fun splitDigits(number: Int): String {
         val formatter = DecimalFormat("#,###")
         return formatter.format(number).replace(",", ".") // Forzamos el punto chileno
+    }
+
+    // Total Diario
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun inicioDeHoyMillis(): Long {
+        return LocalDate.now()
+            .atStartOfDay(ZoneId.systemDefault())
+            .toInstant()
+            .toEpochMilli()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    val totalHoy: StateFlow<Int> = dataRepo
+        .totalDesde(inicioDeHoyMillis())
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = 0
+        )
+
+    val maxDiario: StateFlow<Int> = configRepo.maxDiario
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = 0
+        )
+
+    fun setMaxDiario(valor: Int) {
+        viewModelScope.launch {
+            configRepo.setMaxDiario(valor)
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun puedeAgregar(monto: Int): Boolean {
+        val tope = maxDiario.value
+        if (tope <= 0) return true
+        return totalHoy.value + monto <= tope
     }
 }

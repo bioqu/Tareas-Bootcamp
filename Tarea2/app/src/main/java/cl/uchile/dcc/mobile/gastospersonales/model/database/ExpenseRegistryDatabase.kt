@@ -4,10 +4,13 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room.databaseBuilder
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
+import cl.uchile.dcc.mobile.gastospersonales.model.database.ExpenseRegistryDatabase.Companion.MIGRATION_1_2
 
 @Database(
     entities = [GastosRegistry::class],
-    version = 2,
+    version = 3,
     exportSchema = false,
 )
 
@@ -24,17 +27,36 @@ abstract class ExpenseRegistryDatabase: RoomDatabase() {
                     context.applicationContext,
                     ExpenseRegistryDatabase::class.java,
                     "gastos_registry_database"
-                )//.addMigrations(MIGRATIONS_1_TO_2)
+                ).addMigrations(MIGRATION_2_3)
                     .build()
                 INSTANCE = instance
                 instance
             }
         }
-//        val MIGRATIONS_1_TO_2 = object : Migration(1, 2) {
-//            override suspend fun migrate(connection: SQLiteConnection) {
-//                connection.execSQL("ALTER TABLE GastosRegistry ADD COLUMN tipo:id TEXT")
-//            }
-//        }
+        val MIGRATION_1_2 = object : Migration(1, 2) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "ALTER TABLE GastosRegistry ADD COLUMN fecha INTEGER NOT NULL DEFAULT 0"
+                )
+                // opcional: marcar los viejos como "hoy"
+                val now = System.currentTimeMillis()
+                db.execSQL("UPDATE GastoRegistry SET fecha = $now WHERE fecha = 0")
+            }
+        }
+        val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "ALTER TABLE GastosRegistry ADD COLUMN fecha INTEGER NOT NULL DEFAULT 0"
+                )
+
+                val now = System.currentTimeMillis()
+
+                db.execSQL(
+                    "UPDATE GastosRegistry SET fecha = $now WHERE fecha = 0"
+                )
+            }
+        }
+
     }
 
 }

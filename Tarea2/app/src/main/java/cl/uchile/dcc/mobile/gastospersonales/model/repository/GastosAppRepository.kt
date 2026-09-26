@@ -4,20 +4,34 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 
 object PreferenceKeys {
-    val  THEME_MODE = stringPreferencesKey("TemaActual")
+    val THEME_MODE = stringPreferencesKey("TemaActual")
     val LANGUAGE = stringPreferencesKey("Idioma")
     val USERNAME = stringPreferencesKey("NombreUsuario")
+    val MAX_DIARIO = intPreferencesKey("MaximoDiario")
 }
 class GastosAppRepository(
     private val context: Context,
     private val config: DataStore<Preferences>
 ) {
+    // Máximo Diario
+    val maxDiario: Flow<Int> = config.data
+        .map { preferences ->
+            preferences[PreferenceKeys.MAX_DIARIO] ?: 0
+        }
+
+    suspend fun setMaxDiario(valor: Int) {
+        config.edit { preferences ->
+            preferences[PreferenceKeys.MAX_DIARIO] = valor
+        }
+    }
+
     // Theme Datastore
     val theme: Flow<String> = config.data
             .map { preferences ->

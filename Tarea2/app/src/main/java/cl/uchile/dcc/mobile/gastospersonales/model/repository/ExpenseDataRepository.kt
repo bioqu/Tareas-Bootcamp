@@ -3,6 +3,7 @@ package cl.uchile.dcc.mobile.gastospersonales.model.repository
 import android.content.Context
 import cl.uchile.dcc.mobile.gastospersonales.model.database.GastosRegistry
 import cl.uchile.dcc.mobile.gastospersonales.model.database.ExpenseRegistryDatabase
+import kotlinx.coroutines.flow.Flow
 
 class ExpenseDataRepository(
     private val context: Context
@@ -11,8 +12,12 @@ class ExpenseDataRepository(
     private val database = ExpenseRegistryDatabase.getInstance(context)
     private val dao = database.expenseRegistryDAO
 
+    fun totalDesde(inicioDia: Long): Flow<Int> {
+        return dao.totalDesde(inicioDia)
+    }
+
     // Create del CRUD
-    suspend fun addGastosRegistry(gastosRegistry: GastosRegistry): Long {
+    suspend fun addGastosRegistry(gastosRegistry: GastosRegistry) {
         return dao.addGastosRegistry(gastosRegistry)
 //        val db = dbHelper.writableDatabase
 //        val values = ContentValues().apply {
