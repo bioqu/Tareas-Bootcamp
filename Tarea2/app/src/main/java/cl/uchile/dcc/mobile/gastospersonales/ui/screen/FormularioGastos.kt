@@ -17,6 +17,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -35,7 +36,7 @@ import kotlinx.coroutines.launch
 // monto con un boton que completa la funcion de agregar
 @Composable
 fun FormularioGastos(
-    modifier: Modifier = Modifier.Companion,
+    modifier: Modifier = Modifier,
     viewModel: RegistryViewModel = viewModel(),
     snackbarHostState: SnackbarHostState
 ) {

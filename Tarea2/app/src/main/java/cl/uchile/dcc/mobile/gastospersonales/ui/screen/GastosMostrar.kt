@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -16,18 +17,23 @@ import cl.uchile.dcc.mobile.gastospersonales.viewmodel.RegistryViewModel
 
 // GastosMostrar()
 // Crea la pantalla para revisar los gastos. Estos se crean un Card() y cada gasto va en una fila con el
-// siguiente formato: [Concepto          monto(numero en formato 1.000.000.$]
+// siguiente formato: [Concepto monto(numero en formato 1.000.000.$ button borrar]
 @Composable
 fun GastosMostrar(
     modifier: Modifier = Modifier,
     viewModel: RegistryViewModel = viewModel()
 ) {
+    // Se ejecuta al entrar a la pantalla para cargar los datos de la BD
+    LaunchedEffect(Unit) {
+        viewModel.cargarGastos()
+    }
+
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    // Extraemos la lista de gastos dependiendo del estado del evento
+    // Lista de Gastos
     val listaDeGastos = when (val event = state.event) {
         is ExpenseEventState.Success -> event.gastos
-        else -> emptyList() // Si está cargando, vacío o hay error, mostramos lista vacía por ahora
+        else -> emptyList()
     }
 
     // LazyColumn que albergara los gastos ingresados en la pantalla FormularioGastos.kt
@@ -38,11 +44,11 @@ fun GastosMostrar(
         content = {
             items(
                 items = listaDeGastos,
-                key = { it.hashCode() } // opcional pero recomendado para mejor performance
+                key = { it.id } // opcional pero recomendado para mejor performance
             ) { gasto ->
                 // GastosCard genera un Card() con los gastos ordenados asi:
-                // concepto de gasto a lado izquierdo y al lado derecho monto
-                GastosCard(gasto) // pasa el ítem individual, no toda la lista
+                // concepto de gasto a lado izquierdo, al lado derecho monto e IconButton
+                GastosCard(gastos = gasto, viewModel = viewModel) // pasa el ítem individual, no toda la lista
             }
         }
     )
