@@ -4,9 +4,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -14,6 +17,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import cl.uchile.dcc.mobile.gastospersonales.ui.component.GastosCard
 import cl.uchile.dcc.mobile.gastospersonales.ui.screenstate.ExpenseEventState
 import cl.uchile.dcc.mobile.gastospersonales.viewmodel.RegistryViewModel
+import kotlinx.coroutines.launch
 
 // GastosMostrar()
 // Crea la pantalla para revisar los gastos. Estos se crean un Card() y cada gasto va en una fila con el
@@ -21,8 +25,12 @@ import cl.uchile.dcc.mobile.gastospersonales.viewmodel.RegistryViewModel
 @Composable
 fun GastosMostrar(
     modifier: Modifier = Modifier,
-    viewModel: RegistryViewModel = viewModel()
+    viewModel: RegistryViewModel = viewModel(),
+    snackbarHostState: SnackbarHostState
 ) {
+    // Snackbar
+    val scope = rememberCoroutineScope()
+
     // Se ejecuta al entrar a la pantalla para cargar los datos de la BD
     LaunchedEffect(Unit) {
         viewModel.cargarGastos()
@@ -48,7 +56,15 @@ fun GastosMostrar(
             ) { gasto ->
                 // GastosCard genera un Card() con los gastos ordenados asi:
                 // concepto de gasto a lado izquierdo, al lado derecho monto e IconButton
-                GastosCard(gastos = gasto, viewModel = viewModel) // pasa el ítem individual, no toda la lista
+                GastosCard(gastos = gasto, viewModel = viewModel, onDeleted = {
+                    scope.launch {
+                        snackbarHostState.showSnackbar(
+                            message = "Gasto eliminado",
+                            withDismissAction = true,
+                            duration = SnackbarDuration.Short
+                        )
+                    }
+                }) // pasa el ítem individual, no toda la lista
             }
         }
     )

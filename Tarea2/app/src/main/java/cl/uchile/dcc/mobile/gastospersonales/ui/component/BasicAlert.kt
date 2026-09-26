@@ -7,12 +7,16 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.vector.ImageVector
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -20,10 +24,11 @@ fun BasicAlert(
     label: String,
     message: String,
     callBack: () -> Unit,
-    icon: ImageVector,
+    icon: ImageVector
 ) {
     // Se determina que la alerta es falsa hasta presionar IconButton
     val openDialog = remember { mutableStateOf(false) }
+
 
     IconButton(onClick = { openDialog.value = true }) {
         Icon(

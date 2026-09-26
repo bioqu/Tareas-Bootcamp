@@ -196,7 +196,8 @@ fun ExpenseRegistryApp(screenViewModel: RegistryViewModel = viewModel()) {
             composable(ScreenRoutes.HISTORIAL.route) {
                 GastosMostrar(
                     modifier = Modifier.padding(innerPadding),
-                    viewModel = screenViewModel
+                    viewModel = screenViewModel,
+                    snackbarHostState = snackbarHostState
                 )
             }
         }
